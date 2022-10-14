@@ -176,7 +176,7 @@ export default {
         let that = this;
         res.result.skuList.forEach(function (sku, index, array) {
           that.skuData.push({
-            specs: sku.goodsName,
+            specs: sku.simpleSpecs,
             sn: sku.sn,
             weight: sku.weight,
             cost: that.$options.filters.unitPrice(sku.cost, "¥"),
