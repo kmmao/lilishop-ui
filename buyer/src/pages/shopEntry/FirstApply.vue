@@ -36,7 +36,7 @@
           type="text"
           v-model="form.companyPhone"
           placeholder="请填写公司电话"
-          ></Input>
+          ></Input> 例：0592-1234567、0400-1234567
       </FormItem>
       <FormItem prop="registeredCapital" label="注册资金">
         <Input
