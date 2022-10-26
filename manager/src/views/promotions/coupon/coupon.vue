@@ -45,7 +45,7 @@
           icon="ios-search"
           class="search-btn"
           >搜索</Button
-        >
+        > 
       </Form>
       <Row class="operation padding-row" v-if="getType !== 'ACTIVITY'">
         <Button @click="add" type="primary">添加优惠券</Button>
@@ -162,6 +162,11 @@ export default {
           key: "couponName",
           minWidth: 100,
           tooltip: true,
+        },
+        {
+          title: "兑换嘟币值",
+          key: "ddgPrice",
+          width: 100
         },
         {
           title: "面额/折扣",

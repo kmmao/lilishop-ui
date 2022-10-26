@@ -56,6 +56,16 @@
                 style="width: 260px"
               />
             </FormItem>
+            <FormItem label="兑换嘟币值" prop="ddgPrice">
+              <Input
+                :disabled="disabled"
+                type="text"
+                v-model="form.ddgPrice"
+                placeholder="兑换嘟币值"
+                clearable
+                style="width: 260px"
+              />
+            </FormItem>
             <FormItem label="活动类型" prop="getType">
               <Select :disabled="disabled" v-model="form.getType" style="width: 260px">
                 <Option value="FREE">免费领取</Option>
