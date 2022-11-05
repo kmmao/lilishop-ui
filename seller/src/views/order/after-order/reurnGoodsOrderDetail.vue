@@ -129,8 +129,32 @@
                 <dt>审核结果</dt>
                 <dd>
                   <div class="div-content">
+                    <span v-if="params.serviceStatus=='APPLY'">
+                      申请中
+                    </span>
                     <span v-if="params.serviceStatus=='PASS'">
-                      审核通过
+                      已通过
+                    </span>
+                    <span v-if="params.serviceStatus=='REFUSE'">
+                      已拒绝
+                    </span>
+                    <span v-if="params.serviceStatus=='BUYER_RETURN'">
+                      待卖家收货
+                    </span>
+                    <span v-if="params.serviceStatus=='SELLER_CONFIRM'">
+                      卖家确认收货
+                    </span>
+                    <span v-if="params.serviceStatus=='SELLER_TERMINATION'">
+                      卖家终止售后
+                    </span>
+                    <span v-if="params.serviceStatus=='BUYER_CANCEL'">
+                      买家取消售后
+                    </span>
+                    <span v-if="params.serviceStatus=='WAIT_REFUND'">
+                      等待平台退款
+                    </span>
+                    <span v-if="params.serviceStatus=='COMPLETE'">
+                      完成
                     </span>
                     <span v-else>
                       审核拒绝
