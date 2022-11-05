@@ -287,15 +287,16 @@ export const result = [{
             component: "promotion/full-discount/full-discount",
             children: null
           },
-          {
-            name: "coupon",
-            level: 2,
-            type: 0,
-            title: "优惠券",
-            path: "coupon",
-            component: "promotion/coupon/coupon",
-            children: null
-          },
+          // TODO lk 这里先做隐藏处理，留着黎明以后开发
+          // {
+          //   name: "coupon",
+          //   level: 2,
+          //   type: 0,
+          //   title: "优惠券",
+          //   path: "coupon",
+          //   component: "promotion/coupon/coupon",
+          //   children: null
+          // },
         ]
       },
       {
