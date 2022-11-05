@@ -14,6 +14,9 @@
           type="primary"
           >修改收货地址</Button
         >
+        <Button v-if="allowOperation.cancel" @click="orderCancel" type="warning" ghost
+            >订单取消</Button
+          >
         <Button
           v-if="allowOperation.showLogistics"
           @click="logistics"
@@ -281,6 +284,35 @@
       <div slot="footer" style="text-align: right">
         <Button @click="modal = false">关闭</Button>
         <Button type="primary" @click="modifyPriceSubmit">调整</Button>
+      </div>
+    </Modal>
+    <!-- 订单取消模态框 -->
+    <Modal v-model="orderCancelModal" width="530">
+      <p slot="header">
+        <Icon type="edit"></Icon>
+        <span>订单取消</span>
+      </p>
+      <div>
+        <Form
+          ref="orderCancelForm"
+          :model="orderCancelForm"
+          label-position="left"
+          :label-width="100"
+          :rules="orderCancelValidate"
+        >
+          <FormItem label="取消原因" prop="reason">
+            <Input
+              v-model="orderCancelForm.reason"
+              type="textarea"
+              :autosize="{ minRows: 2, maxRows: 5 }"
+              placeholder="请输入取消原因"
+            ></Input>
+          </FormItem>
+        </Form>
+      </div>
+      <div slot="footer" style="text-align: right">
+        <Button @click="orderCancelModal = false">关闭</Button>
+        <Button type="primary" @click="orderCancelSubmit">确认</Button>
       </div>
     </Modal>
     <!--收件地址弹出框-->
@@ -589,6 +621,12 @@ export default {
           { required: true, message: "订单核销码不能为空", trigger: "blur" },
         ],
       },
+      //订单取消表单
+      orderCancelForm: {
+        reason: "",
+      },
+      //弹出订单取消框
+      orderCancelModal: false,
       //订单发货
       orderDeliveryForm: {
         logisticsNo: "", //发货单号
@@ -604,6 +642,10 @@ export default {
             trigger: "change",
           },
         ],
+      },
+       //验证取消订单原因
+       orderCancelValidate: {
+        reason: [{ required: true, message: "取消原因不能为空", trigger: "blur" }],
       },
       addressModal: false, //弹出修改收件信息框
       //收件地址表单
@@ -860,6 +902,36 @@ export default {
         this.orderInfo.order.consigneeAddressPath;
       this.addressForm.consigneeAddressIdPath =
         this.orderInfo.order.consigneeAddressIdPath;
+    },
+    //订单取消
+    orderCancel() {
+      this.orderCancelModal = true;
+    },
+    //订单取消提交
+    orderCancelSubmit() {
+      this.$refs.orderCancelForm.validate((valid) => {
+        if (valid) {
+          API_Order.cancelOrder(this.sn, this.orderCancelForm).then((res) => {
+            if (res.success) {
+              this.$Message.success("取消成功");
+              this.getDataList();
+            }
+            this.orderCancelModal = false;
+          });
+        }
+      });
+    },
+    // 获取订单详情
+    getDataList() {
+      this.loading = true;
+      API_Order.orderDetail(this.sn).then((res) => {
+        this.loading = false;
+        if (res.success) {
+          this.orderInfo = res.result;
+          this.allowOperation = res.result.allowOperationVO;
+          this.data = res.result.orderItems;
+        }
+      });
     },
     //修改收货地址
     editAddressSubmit() {
