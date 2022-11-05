@@ -417,6 +417,7 @@ export default {
           this.afterSaleInfo = res.result;
           this.afterSaleImage = (res.result.afterSaleImage || "").split(",");
           this.params.actualRefundPrice = res.result.applyRefundPrice;
+          this.params.serviceStatus = res.result.serviceStatus;
         }
       });
     },

@@ -15,7 +15,7 @@
           >修改收货地址</Button
         >
         <Button v-if="allowOperation.cancel" @click="orderCancel" type="warning" ghost
-            >订单取消</Button
+            >订单退款</Button
           >
         <Button
           v-if="allowOperation.showLogistics"
