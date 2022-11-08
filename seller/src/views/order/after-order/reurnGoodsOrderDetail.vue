@@ -132,28 +132,28 @@
                     <span v-if="params.serviceStatus=='APPLY'">
                       申请中
                     </span>
-                    <span v-if="params.serviceStatus=='PASS'">
+                    <span v-else-if="params.serviceStatus=='PASS'">
                       已通过
                     </span>
-                    <span v-if="params.serviceStatus=='REFUSE'">
+                    <span v-else-if="params.serviceStatus=='REFUSE'">
                       已拒绝
                     </span>
-                    <span v-if="params.serviceStatus=='BUYER_RETURN'">
+                    <span v-else-if="params.serviceStatus=='BUYER_RETURN'">
                       待卖家收货
                     </span>
-                    <span v-if="params.serviceStatus=='SELLER_CONFIRM'">
+                    <span v-else-if="params.serviceStatus=='SELLER_CONFIRM'">
                       卖家确认收货
                     </span>
-                    <span v-if="params.serviceStatus=='SELLER_TERMINATION'">
+                    <span v-else-if="params.serviceStatus=='SELLER_TERMINATION'">
                       卖家终止售后
                     </span>
-                    <span v-if="params.serviceStatus=='BUYER_CANCEL'">
+                    <span v-else-if="params.serviceStatus=='BUYER_CANCEL'">
                       买家取消售后
                     </span>
-                    <span v-if="params.serviceStatus=='WAIT_REFUND'">
+                    <span v-else-if="params.serviceStatus=='WAIT_REFUND'">
                       等待平台退款
                     </span>
-                    <span v-if="params.serviceStatus=='COMPLETE'">
+                    <span v-else-if="params.serviceStatus=='COMPLETE'">
                       完成
                     </span>
                     <span v-else>
