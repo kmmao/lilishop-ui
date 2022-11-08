@@ -460,6 +460,7 @@ export default {
       let title = "确认收货";
       let content = "请确认已经收到退货货物?";
       let message = "收货成功";
+      this.params.serviceStatus = "PASS";
       if (type !== "PASS") {
         title = "确认拒收";
         content = "确认拒收此货物？";
