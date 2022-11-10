@@ -198,6 +198,12 @@
                 <dd>
                   {{ afterSaleInfo.orderSn }}
                 </dd>
+                <dt>
+                  订单状态
+                </dt>
+                <dd>
+                  {{ afterSaleInfo.orderStatus }}
+                </dd>
               </dl>
               <dl v-if="afterSaleInfo.bankDepositName">
                 <dt>银行开户行</dt>
