@@ -202,7 +202,27 @@
                   订单状态
                 </dt>
                 <dd>
-                  {{ afterSaleInfo.orderStatus }}
+                  <span v-if="afterSaleInfo.orderStatus=='UNPAID'">
+                    未付款
+                  </span>
+                  <span v-else-if="afterSaleInfo.orderStatus=='PAID'">
+                    已付款
+                  </span>
+                  <span v-else-if="afterSaleInfo.orderStatus=='UNDELIVERED'">
+                    待发货
+                  </span>
+                  <span v-else-if="afterSaleInfo.orderStatus=='DELIVERED'">
+                    已发货
+                  </span>
+                  <span v-else-if="afterSaleInfo.orderStatus=='COMPLETED'">
+                    已完成
+                  </span>
+                  <span v-else-if="afterSaleInfo.orderStatus=='TAKE'">
+                    待核验
+                  </span>
+                  <span v-else>
+                    已取消
+                  </span>
                 </dd>
               </dl>
               <dl v-if="afterSaleInfo.bankDepositName">
