@@ -122,6 +122,29 @@
           </Row>
         </Card>
       </Tab-pane>
+      <Tab-pane label="已支付未确认流水" key="key1">
+        <Card>
+          <Table
+            :loading="loading"
+            border
+            :columns="uncompletedColumns"
+            :data="uncompleted"
+            ref="table"
+          ></Table>
+          <Row type="flex" justify="end" class="mt_10">
+            <Page
+              :current="uncompletedParam.pageNumber"
+              :total="uncompletedTotal"
+              :page-size="uncompletedParam.pageSize"
+              @on-change="uncompletedChangePage"
+              @on-page-size-change="uncompletedChangePageSize"
+              size="small"
+              show-total
+              show-elevator
+            ></Page>
+          </Row>
+        </Card>
+      </Tab-pane>
       <Tab-pane label="退款流水" key="key2">
         <Card>
           <Table
@@ -217,6 +240,118 @@ export default {
         endDate: null,
       },
       orderColumns: [
+        // 订单表头
+        {
+          title: "入账时间",
+          key: "createTime",
+          minWidth: 120,
+          tooltip: true,
+        },
+        {
+          title: "订单编号",
+          key: "orderSn",
+          minWidth: 120,
+          tooltip: true,
+        },
+        {
+          title: "订单金额",
+          key: "finalPrice",
+          width: 120,
+          render: (h, params) => {
+            return h(
+              "div",
+              this.$options.filters.unitPrice(params.row.finalPrice, "￥")
+            );
+          },
+        },
+        {
+          title: "平台分佣",
+          key: "commissionPrice",
+          width: 120,
+          render: (h, params) => {
+            return h(
+              "div",
+              this.$options.filters.unitPrice(params.row.commissionPrice, "￥")
+            );
+          },
+        },
+        {
+          title: "平台优惠券",
+          key: "siteCouponPrice",
+          render: (h, params) => {
+            if (params.row.siteCouponPrice == null) {
+              return h("div", "-");
+            } else {
+              return h(
+                "div",
+                this.$options.filters.unitPrice(
+                  params.row.siteCouponPrice,
+                  "￥"
+                )
+              );
+            }
+          },
+        },
+        {
+          title: "平台优惠券补贴金额",
+          key: "siteCouponCommission",
+          render: (h, params) => {
+            if (params.row.siteCouponCommission == null) {
+              return h("div", "-");
+            } else {
+              return h(
+                "div",
+                this.$options.filters.unitPrice(
+                  params.row.siteCouponCommission,
+                  "￥"
+                )
+              );
+            }
+          },
+        },
+        {
+          title: "分销金额",
+          key: "distributionRebate",
+          width: 120,
+          render: (h, params) => {
+            if (params.row.distributionRebate == null) {
+              return h("div", "-");
+            } else {
+              return h(
+                "div",
+                this.$options.filters.unitPrice(
+                  params.row.distributionRebate,
+                  "￥"
+                )
+              );
+            }
+          },
+        },
+        {
+          title: "应结金额",
+          key: "billPrice",
+          width: 120,
+          render: (h, params) => {
+            return h(
+              "div",
+              this.$options.filters.unitPrice(params.row.billPrice, "￥")
+            );
+          },
+        },
+      ],
+
+      uncompleted: [], // 已支付未确认列表
+      uncompletedParam: {
+        // 请求参数
+        pageNumber: 1, // 当前页数
+        pageSize: 10, // 页面大小
+        sort: "id", // 默认排序字段
+        order: "desc", // 默认排序方式
+        flowType: "UNCOMPLETED",
+        startDate: null,
+        endDate: null,
+      },
+      uncompletedColumns: [
         // 订单表头
         {
           title: "入账时间",
@@ -418,6 +553,7 @@ export default {
         },
       ],
       orderTotal: 0, // 订单总数
+      uncompletedTotal: 0, // 已支付未确认收货总数
       refundTotal: 0, // 退款单总数
     };
   },
@@ -433,6 +569,17 @@ export default {
       this.orderParam.pageSize = v;
       this.getOrder();
     },
+    //已支付未确认收货页数发生变化
+    uncompletedChangePage(v) {
+      this.uncompletedParam.pageNumber = v;
+      this.getUncompleted();
+    },
+    //已支付未确认收货每页条数变化
+    uncompletedChangePageSize(v) {
+      this.uncompletedParam.pageNumber = 1;
+      this.uncompletedParam.pageSize = v;
+      this.getUncompleted();
+    },
     //退款单页数发生变化
     refundOrderChangePage(v) {
       this.refundParam.pageNumber = v;
@@ -441,7 +588,7 @@ export default {
     //退款单每页条数变化
     refundOrderChangePageSize(v) {
       this.refundParam.pageSize = v;
-      tthis.getRefund();
+      this.getRefund();
     },
     clickTabs(index) {
       this.orderParam.pageNumber = 1
@@ -506,8 +653,13 @@ export default {
         bill.orderPrice ? bill.orderPrice : 0,
         "¥"
       );
-      this.data[7].name = "结算金额";
+      this.data[7].name = "已支付未确认金额";
       this.data[7].value = filters.unitPrice(
+        bill.uncompletedPrice ? bill.uncompletedPrice : 0,
+        "¥"
+      );
+      this.data[8].name = "结算金额";
+      this.data[8].value = filters.unitPrice(
         bill.billPrice ? bill.billPrice : 0,
         "¥"
       );
@@ -520,6 +672,15 @@ export default {
         }
       });
       this.orderTotal = this.order.length;
+    },
+    getUncompleted() {
+      API_Shop.getStoreFlow(this.id, this.uncompletedParam).then((res) => {
+        if (res.result) {
+          this.uncompleted = res.result.records;
+          this.uncompletedTotal = res.result.total;
+        }
+      });
+      this.uncompletedTotal = this.uncompleted.length;
     },
     getRefund() {
       API_Shop.getStoreFlow(this.id, this.orderParam).then((res) => {

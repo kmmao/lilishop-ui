@@ -86,6 +86,13 @@
               show-elevator></Page>
           </Row>
         </Tab-pane>
+        <Tab-pane label="已支付未确认列表" name="uncompleted">
+          <Table :loading="loading" border :columns="uncompletedColumns" :data="uncompletedData" ref="table"></Table>
+          <Row type="flex" justify="end" class="mt_10">
+            <Page :current="uncompletedParam.pageNumber" :total="uncompletedTotal" :page-size="uncompletedParam.pageSize" @on-change="uncompletedChangePage" @on-page-size-change="uncompletedChangePageSize" size="small" show-total
+              show-elevator></Page>
+          </Row>
+        </Tab-pane>
         <Tab-pane label="退单列表" name="refund">
           <Table :loading="loading" border :columns="refundColumns" :data="refundData" ref="table"></Table>
           <Row type="flex" justify="end" class="mt_10">
@@ -296,6 +303,141 @@ export default {
       ],
       orderData: [], // 订单列表
       orderTotal: 0, // 订单数量
+      uncompletedParam: {
+        pageNumber: 1, // 当前页数
+        pageSize: 10, // 页面大小
+        sort: "id", // 默认排序字段
+        order: "desc", // 默认排序方式
+        flowType: "UNCOMPLETED",
+      },
+      uncompletedColumns: [
+        {
+          title: "入账时间",
+          key: "createTime",
+        },
+        {
+          title: "订单编号",
+          key: "orderSn",
+        },
+        {
+          title: "订单金额",
+          key: "finalPrice",
+          render: (h, params) => {
+            return h(
+              "div",
+              this.$options.filters.unitPrice(params.row.finalPrice, "￥")
+            );
+          },
+        },
+        {
+          title: "砍价商品结算价格",
+          key: "kanjiaSettlementPrice",
+          render: (h, params) => {
+            if (params.row.kanjiaSettlementPrice) {
+              return h(
+                "div",
+                this.$options.filters.unitPrice(
+                  params.row.kanjiaSettlementPrice,
+                  "￥"
+                )
+              );
+            } else {
+              return h("div", "￥0.00");
+            }
+          },
+        },
+        {
+          title: "积分商品结算价格",
+          key: "pointSettlementPrice",
+          render: (h, params) => {
+            if (params.row.pointSettlementPrice) {
+              return h(
+                "div",
+                this.$options.filters.unitPrice(
+                  params.row.pointSettlementPrice,
+                  "￥"
+                )
+              );
+            } else {
+              return h("div", "￥0.00");
+            }
+          },
+        },
+        {
+          title: "平台分佣",
+          key: "commissionPrice",
+          render: (h, params) => {
+            return h(
+              "div",
+              this.$options.filters.unitPrice(params.row.commissionPrice, "￥")
+            );
+          },
+        },
+        {
+          title: "平台优惠券",
+          key: "siteCouponPrice",
+          render: (h, params) => {
+            if (params.row.siteCouponPrice == null) {
+              return h("div", "-");
+            } else {
+              return h(
+                "div",
+                this.$options.filters.unitPrice(
+                  params.row.siteCouponPrice,
+                  "￥"
+                )
+              );
+            }
+          },
+        },
+		{
+		  title: "平台优惠券补贴金额",
+		  key: "siteCouponCommission",
+		  render: (h, params) => {
+		    if(params.row.siteCouponCommission == null){
+		      return h(
+		        "div",
+		        "-"
+		      );
+		    }else{
+		      return h(
+		        "div",
+		        this.$options.filters.unitPrice(params.row.siteCouponCommission, "￥")
+		      );
+		    }
+		
+		  },
+		},
+        {
+          title: "分销金额",
+          key: "distributionRebate",
+          render: (h, params) => {
+            if (params.row.distributionRebate == null) {
+              return h("div", "-");
+            } else {
+              return h(
+                "div",
+                this.$options.filters.unitPrice(
+                  params.row.distributionRebate,
+                  "￥"
+                )
+              );
+            }
+          },
+        },
+        {
+          title: "应结金额",
+          key: "billPrice",
+          render: (h, params) => {
+            return h(
+              "div",
+              this.$options.filters.unitPrice(params.row.billPrice, "￥")
+            );
+          },
+        },
+      ],
+      uncompletedData: [], // 已支付未确认列表
+      uncompletedTotal: 0, // 已支付未确认收货数量
       //退单部分
       refundParam: {
         pageNumber: 1, // 当前页数
@@ -538,6 +680,24 @@ export default {
         }
       });
     },
+    //已支付未确认列表部分
+    uncompletedChangePage(v) {
+      this.orderParam.pageNumber = v;
+      this.getUncompletedList();
+    },
+    uncompletedChangePageSize(v) {
+      this.orderParam.pageSize = v;
+      this.getUncompletedList();
+    },
+    getUncompletedList() {
+      API_Shop.getSellerFlow(this.id, this.uncompletedParam).then((res) => {
+        if (res.success) {
+          this.loading = false;
+          this.uncompletedData = res.result.records;
+          this.uncompletedTotal = res.result.total;
+        }
+      });
+    },
     //退单部分
     refundChangePage(v) {
       this.refundParam.pageNumber = v;
@@ -614,8 +774,13 @@ export default {
         bill.orderPrice ? bill.orderPrice : 0,
         "¥"
       );
-      this.data[7].name = "结算金额";
+      this.data[7].name = "已支付未确认金额";
       this.data[7].value = filters.unitPrice(
+        bill.uncompletedPrice ? bill.uncompletedPrice : 0,
+        "¥"
+      );
+      this.data[8].name = "结算金额";
+      this.data[8].value = filters.unitPrice(
         bill.billPrice ? bill.billPrice : 0,
         "¥"
       );
