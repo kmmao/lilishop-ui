@@ -122,7 +122,7 @@
           </Row>
         </Card>
       </Tab-pane>
-      <Tab-pane label="已支付未确认流水" key="key1">
+      <Tab-pane label="已支付未确认流水" key="key2">
         <Card>
           <Table
             :loading="loading"
@@ -145,7 +145,7 @@
           </Row>
         </Card>
       </Tab-pane>
-      <Tab-pane label="退款流水" key="key2">
+      <Tab-pane label="退款流水" key="key3">
         <Card>
           <Table
             :loading="loading"
@@ -193,6 +193,10 @@ export default {
       ],
       data: [
         // 数据
+        {
+          name: "计算中",
+          value: 0,
+        },
         {
           name: "计算中",
           value: 0,
@@ -592,9 +596,12 @@ export default {
     },
     clickTabs(index) {
       this.orderParam.pageNumber = 1
-      if (index == 1) {
+      if (index == 2) {
         this.orderParam.flowType = "REFUND";
         this.getRefund();
+      }else if (index == 1) {
+        this.orderParam.flowType = "UNCOMPLETED";
+        this.getUncompleted();
       } else {
         this.orderParam.flowType = "PAY";
         this.getOrder();

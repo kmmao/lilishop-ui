@@ -165,6 +165,10 @@ export default {
           name: "计算公式",
           value: 0,
         },
+        {
+          name: "计算公式",
+          value: 0,
+        },
       ],
       id: "", // 账单id
       bill: {}, // 商家信息
@@ -635,6 +639,9 @@ export default {
       } else if (v === "refund") {
         this.orderParam.flowType = "REFUND";
         this.getRefundList();
+      } else if (v === "uncompleted") {
+        this.orderParam.flowType = "UNCOMPLETED";
+        this.getUncompletedList();
       } else {
         this.getDistributionList();
       }
