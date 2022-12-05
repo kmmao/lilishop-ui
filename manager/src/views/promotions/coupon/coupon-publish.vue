@@ -133,7 +133,7 @@
               />
             </FormItem>
             <FormItem label="有效期" prop="rangeTime">
-              <div v-if="form.getType == 'ACTIVITY'">
+              <div>
                 <RadioGroup v-model="rangeTimeType">
                   <Radio :disabled="disabled" :label="1">起止时间</Radio>
                   <Radio :disabled="disabled" :label="0">固定时间</Radio>
@@ -459,7 +459,7 @@ export default {
         if (valid) {
           const params = JSON.parse(JSON.stringify(this.form));
           // 判断当前活动类型
-          params.getType != "ACTIVITY" ? delete params.effectiveDays : "";
+          // params.getType != "ACTIVITY" ? delete params.effectiveDays : "";
 
           //判断当前时间类型
           if (this.rangeTimeType == 1) {
@@ -473,7 +473,13 @@ export default {
             delete params.effectiveDays;
           } else {
             params.rangeDayType = "DYNAMICTIME";
-            delete params.rangeTime;
+            params.startTime = this.$options.filters.unixToDate(
+              this.form.rangeTime[0] / 1000
+            );
+            params.endTime = this.$options.filters.unixToDate(
+              this.form.rangeTime[1] / 1000
+            );
+            // delete params.rangeTime;
           }
 
           let scopeId = [];
