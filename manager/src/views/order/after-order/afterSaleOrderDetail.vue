@@ -515,6 +515,11 @@ export default {
         this.$Message.error("请输入退款金额");
         return;
       }
+      if (this.params.serviceStatus == "APPLY"){
+        this.$Message.error("请选择是否同意");
+        this.submitLoading = false;
+        return;
+      }
       API_Order.afterSaleSellerReview(this.sn, this.params).then((res) => {
         this.submitLoading = false;
         if (res.success) {
