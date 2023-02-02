@@ -370,7 +370,7 @@
             <Input
               v-model="addressForm.consigneeDetail"
               size="large"
-              maxlength="11"
+              maxlength="50"
             ></Input>
           </FormItem>
         </Form>
