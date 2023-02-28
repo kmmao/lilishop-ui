@@ -1,11 +1,19 @@
+/*
+ * @Author: liukai liukai@quanwu.info
+ * @Date: 2022-10-08 20:19:21
+ * @LastEditors: liukai liukai@quanwu.info
+ * @LastEditTime: 2023-03-01 00:06:09
+ * @FilePath: /lilishop-ui/buyer/src/config/index.js
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 
 const Cookie = require('js-cookie')
 module.exports = {
-  title:Cookie.get('siteName') || 'lilishop', //配置显示在浏览器标签的title、底部信息、部分信息展示的值
+  title:Cookie.get('siteName') || 'zmddgshop', //配置显示在浏览器标签的title、底部信息、部分信息展示的值
   icpCard: "", // icp证
   company: {
-    href: "https://pickmall.cn",
-    name: "北京宏业汇成科技有限公司",
+    href: "https://www.zmddg.com",
+    name: "厦门攒米科技有限公司",
   }, //公司信息
   icpMessage: "京ICP备20009696号-1", //icp备案
   /**

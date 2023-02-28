@@ -1,5 +1,13 @@
+/*
+ * @Author: liukai liukai@quanwu.info
+ * @Date: 2022-10-08 20:19:21
+ * @LastEditors: liukai liukai@quanwu.info
+ * @LastEditTime: 2023-03-01 00:06:29
+ * @FilePath: /lilishop-ui/seller/src/config/index.js
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 module.exports = {
-  title: "lilishop", //配置显示在浏览器标签的title
+  title: "zmddgshop", //配置显示在浏览器标签的title
    /**
    * 高德地图申请链接
    * https://lbs.amap.com/api/javascript-api/guide/abc/prepare
@@ -8,7 +16,7 @@ module.exports = {
   //FIXME 请检查当前高德key创建的日期，如果2021年12月02日之前申请的 无需填写安全密钥
   aMapSecurityJsCode:"2bd0fbf621881f4c77be74f0e76495f3", // 高德web端js申请的安全密钥
   aMapKey: "7f11113750315d8543daaf5c3ba353ca", //高德web端js申请的api key
-  website: "https://www.pickmall.cn", //官网地址
+  website: "https://www.zmddg.com", //官网地址
   enableCDN: true, //生产环境 是否启用cdn加载 vue等js
   port: 10002, //端口
 };
