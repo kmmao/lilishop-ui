@@ -293,7 +293,8 @@
               }}</span>
             </li>
             <li>
-              <span class="label">应付金额：</span>
+              <span class="label" v-if="orderInfo.orderStatusValue === '未付款'">应付金额：</span>
+              <span class="label" v-else>已付金额：</span>
               <span class="txt flowPrice"
                 >¥{{ orderInfo.order.priceDetailDTO.flowPrice | unitPrice }}</span
               >
