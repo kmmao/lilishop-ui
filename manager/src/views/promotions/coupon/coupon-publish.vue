@@ -132,6 +132,7 @@
                 style="width: 260px"
               />
             </FormItem>
+            
             <FormItem label="有效期" prop="rangeTime">
               <div>
                 <RadioGroup v-model="rangeTimeType">
@@ -139,7 +140,8 @@
                   <Radio :disabled="disabled" :label="0">固定时间</Radio>
                 </RadioGroup>
               </div>
-              <div v-if="rangeTimeType == 1">
+              <!-- <div v-if="rangeTimeType == 1"> -->
+                <div>
                 <DatePicker
                   :disabled="disabled"
                   type="datetimerange"
@@ -151,15 +153,17 @@
                 >
                 </DatePicker>
               </div>
-              <div class="effectiveDays" v-if="rangeTimeType == 0">
+              <!-- <div class="effectiveDays" v-if="rangeTimeType == 0"> -->
+                <div class="effectiveDays">
                 领取当天开始
                 <InputNumber
+                 :disabled="disabled"
                   v-model="form.effectiveDays"
                   :min="1"
                   style="width: 100px"
                   :max="365"
                 />
-                天内有效(1-365间的整数)
+                天内有效(1-365间的整数)，当选择固定时间时有效
               </div>
             </FormItem>
 
@@ -249,11 +253,11 @@ export default {
   },
   watch: {
     "form.getType": {
-      handler(val) {
-        if (val == "FREE") {
-          this.rangeTimeType = 1;
-        }
-      },
+      // handler(val) {
+      //   if (val == "FREE") {
+      //     this.rangeTimeType = 1;
+      //   }
+      // },
       deep: true,
     },
     $route(e) {
@@ -291,7 +295,7 @@ export default {
     };
     return {
       disabled: this.$route.query.onlyView,
-      rangeTimeType: 1, // 当前时间类型
+      // rangeTimeType: 1, // 当前时间类型
       modalType: 0, // 是否编辑
       form: {
         /** 店铺承担比例 */
@@ -311,6 +315,7 @@ export default {
         promotionGoodsList: [],
         scopeIdGoods: [],
         rangeDayType: "",
+        effectiveDays: 1,
       },
       id: this.$route.query.id, // 优惠券id
       submitLoading: false, // 添加或编辑提交状态
