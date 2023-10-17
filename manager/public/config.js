@@ -21,19 +21,25 @@ var BASE = {
 
     },
     API_PROD: {
-      common: "https://common-api.zmshops.xycloud.info",
-      buyer: "https://buyer-api.zmshops.xycloud.info",
-      seller: "https://store-api.zmshops.xycloud.info",
-      manager: "https://admin-api.zmshops.xycloud.info"
+      // common: "https://common-api.zmshops.xycloud.info",
+      // buyer: "https://buyer-api.zmshops.xycloud.info",
+      // seller: "https://store-api.zmshops.xycloud.info",
+      // manager: "https://admin-api.zmshops.xycloud.info"
+      common: "https://manager.zmshops.zmddg.com/common-api",
+      buyer: "https://manager.zmshops.zmddg.com/buyer-api",
+      seller: "https://manager.zmshops.zmddg.com/store-api",
+      manager: "https://manager.zmshops.zmddg.com/admin-api"
     },
     /**
      * @description // 跳转买家端地址 pc端
      */
-    PC_URL: "https://buyer.zmshops.xycloud.info",
+    // PC_URL: "https://buyer.zmshops.xycloud.info",
+    PC_URL: "",
     /**
      * @description  // 跳转买家端地址 wap端
      */
-    WAP_URL: "https://h5.zmshops.xycloud.info",
+    // WAP_URL: "https://h5.zmshops.xycloud.info",
+    WAP_URL: "",
     /**
      *  @description api请求基础路径前缀
      */

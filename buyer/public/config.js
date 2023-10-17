@@ -21,9 +21,13 @@ var BASE = {
       manager: "https://admin-api.zmshops.xycloud.info"
     },
     API_PROD: {
-      common: "https://common-api.zmshops.xycloud.info",
-      buyer: "https://buyer-api.zmshops.xycloud.info",
-      seller: "https://store-api.zmshops.xycloud.info",
-      manager: "https://admin-api.zmshops.xycloud.info"
+      // common: "https://common-api.zmshops.xycloud.info",
+      // buyer: "https://buyer-api.zmshops.xycloud.info",
+      // seller: "https://store-api.zmshops.xycloud.info",
+      // manager: "https://admin-api.zmshops.xycloud.info"
+      common: "https://manager.zmshops.zmddg.com/common-api",
+      buyer: "https://manager.zmshops.zmddg.com/buyer-api",
+      seller: "https://manager.zmshops.zmddg.com/store-api",
+      manager: "https://manager.zmshops.zmddg.com/admin-api"
     },
   };
