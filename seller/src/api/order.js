@@ -42,6 +42,11 @@ export const modifyOrderPrice = (sn, params) => {
   return putRequest(`/order/order/update/${sn}/price`, params);
 };
 
+// 修改订单备注
+export const modifyOrderRemark = (sn, params) => {
+  return putRequest(`/order/order/${sn}/sellerRemark`, params);
+};
+
 // 取消订单
 export const cancelOrder = (sn, params) => {
   return postRequest(`/order/order/${sn}/cancel`, params);
@@ -79,6 +84,11 @@ export const getOrderLog = (sn, params) => {
 // 订单发货
 export const orderDelivery = (sn, params) => {
   return postRequest(`/order/order/${sn}/delivery`, params);
+};
+
+// 订单发货
+export const orderShunFengDelivery = (sn) => {
+  return postRequest(`/order/order/${sn}/shunfeng/delivery`);
 };
 
 // 获取商家选中的物流公司
@@ -136,3 +146,20 @@ export const getReceiptPage = params => {
 export const invoicing = id => {
   return postRequest(`/trade/receipt/${id}/invoicing`);
 };
+
+//查询包裹列表
+export const getPackage = (orderSn) => {
+  return getRequest(`/order/order/getPackage/${orderSn}`);
+}
+
+//分包裹发货
+export const partDelivery = (orderSn,params) => {
+  return postRequest(`/order/order/${orderSn}/partDelivery`,params,{
+    "Content-type": "application/json"
+  })
+}
+
+//查询物流
+export const getTracesList = (sn) => {
+  return getRequest(`/order/order/getTracesList/${sn}`);
+}

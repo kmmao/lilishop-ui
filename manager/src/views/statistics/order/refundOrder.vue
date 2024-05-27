@@ -18,7 +18,9 @@
         </div>
         <div class="label-item">
           <span>申请退款金额</span>
-          <span>{{res.applyRefundPrice || 0 | unitPrice('￥')}}</span>
+          <span>
+            <priceColorScheme :value="res.applyRefundPrice" :color="$mainColor"></priceColorScheme>
+          </span>
         </div>
         <div class="label-item">
           <span>商家备注</span>
@@ -79,7 +81,7 @@ export default {
         UNPAID: "未付款",
         PAID: "已付款",
         DELIVERED: "已发货",
-        CANCELLED: "已取消",
+        CANCELLED: "已关闭",
         COMPLETED: "已完成",
         TAKE: "已完成",
       },

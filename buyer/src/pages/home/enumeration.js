@@ -30,8 +30,12 @@ export const orderStatusList = [
     status: 'TAKE'
   },
   {
-    name: '已取消',
+    name: '已关闭',
     status: 'CANCELLED'
+  },
+  {
+    name: '待提货',
+    status: 'STAY_PICKED_UP'
   }
 ]
 // 订单售后状态

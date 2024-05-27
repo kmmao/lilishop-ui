@@ -4,7 +4,7 @@
     <card _Title="我的订单" :_Size="16" :_Tabs="changeWay" @_Change="change" v-if="!homePage"></card>
     <card _Title="我的订单" :_Size="16" :_Tabs="changeWay" @_Change="change" _More="全部订单" _Src="/home/MyOrder" v-else></card>
     <!-- 搜索 筛选 -->
-    <div class="mb_20 box" v-if="!homePage">
+    <div class="mb_24 box" v-if="!homePage">
       <div class="global_float_right" >
         <Input
           class="width_300"
@@ -51,12 +51,11 @@
               <div>
                 <div class="hover-color" @click="goodsDetail(goods.skuId, goods.goodsId)">{{ goods.name }}</div>
                 <div class="mt_10">
-                  <span class="global_color"
-                    >{{ goods.goodsPrice | unitPrice("￥") }} </span
-                  >x {{ goods.num }}
+                  <span class="global_color">{{ goods.goodsPrice | unitPrice("￥") }} </span>x {{ goods.num }}
+                  <span style="margin-left: 10px;color: #ff9900;">{{refundPriceList(goods.isRefund)}}</span>
                 </div>
-                <Button v-if="goods.commentStatus == 'UNFINISHED'" @click="comment(order.sn, goodsIndex)" size="small" type="success" class="fontsize_12" style="position:relative;top:-22px;left:100px;margin-right:10px">评价</Button>
-                <Button v-if="goods.complainStatus == 'NO_APPLY'" @click="complain(order.sn, goodsIndex)" type="warning" class="fontsize_12" size="small" style="position:relative;top:-22px;left:100px">投诉</Button>
+                <Button v-if="goods.commentStatus == 'UNFINISHED'" @click="comment(order.sn, goodsIndex)" size="small" type="success" class="fontsize_12" style="position:relative;top:-22px;left:190px;margin-right:10px">评价</Button>
+                <Button v-if="goods.complainStatus == 'NO_APPLY'" @click="complain(order.sn, goodsIndex)" type="warning" class="fontsize_12" size="small" style="position:relative;top:-22px;left:190px">投诉</Button>
               </div>
             </div>
           </div>
@@ -70,7 +69,8 @@
             <Button @click="goPay(order.sn)" size="small" type="success" v-if="order.allowOperationVO.pay">去支付</Button>
             <Button @click="received(order.sn)" size="small" type="warning" v-if="order.allowOperationVO.rog">确认收货</Button>
             <!-- 售后 -->
-            <Button v-if="order.groupAfterSaleStatus && order.groupAfterSaleStatus.includes('NOT_APPLIED')" @click="applyAfterSale(order.orderItems)" size="small">申请售后</Button>
+            <Button v-if="order.groupAfterSaleStatus && (order.groupAfterSaleStatus.includes('NOT_APPLIED')|| order.groupAfterSaleStatus.includes('PART_AFTER_SALE'))"
+                    @click="applyAfterSale(order.orderItems)" size="small">申请售后</Button>
           </div>
         </div>
       </div>
@@ -154,6 +154,21 @@ export default {
     this.getList();
   },
   methods: {
+    // 退款状态枚举
+    refundPriceList(status) {
+      switch (status) {
+        case 'ALL_REFUND':
+          return "全部退款";
+        case 'PART_REFUND':
+          return "部分退款";
+        case 'NO_REFUND':
+          return "";
+        case 'REFUNDING':
+          return "退款中";
+        default:
+          return "";
+      }
+    },
     goodsDetail (skuId, goodsId) {
       // 跳转商品详情
       let routeUrl = this.$router.resolve({
@@ -206,7 +221,7 @@ export default {
     applyAfterSale (goodsItem) { // 申请售后
       let arr = []
       goodsItem.forEach(e => {
-        if (e.afterSaleStatus === 'NOT_APPLIED') {
+        if (e.afterSaleStatus === 'NOT_APPLIED'|| e.afterSaleStatus === 'PART_AFTER_SALE') {
           arr.push(e)
         }
       });

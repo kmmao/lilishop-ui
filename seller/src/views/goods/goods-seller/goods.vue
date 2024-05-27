@@ -148,9 +148,9 @@
       title="更新库存"
       v-model="updateStockModalVisible"
       :mask-closable="false"
-      :width="500"
+      :width="610"
     >
-      <Tabs value="updateStock">
+      <Tabs value="updateStock" v-model="updateStockType">
         <TabPane label="手动规格更新" name="updateStock">
           <Table
             class="mt_10"
@@ -199,6 +199,7 @@
             <Icon type="ios-cloud-upload" size="102" style="color: #3399ff"></Icon>
             <h2>选择或拖拽文件上传</h2>
           </div>
+          <Spin fix v-if="spinShow"></Spin>
         </Upload>
         <Button @click="exportGoods" type="text" style="color: red">下载导入模板</Button>
       </div>
@@ -222,13 +223,14 @@ import {
 } from "@/api/goods";
 import { baseUrl } from "@/libs/axios.js";
 import * as API_Shop from "@/api/shops";
-import Cookies from "js-cookie";
+
 import {uploadGoodsExcel} from "../../../api/goods";
 
 export default {
   name: "goods",
   data() {
     return {
+      spinShow:false,
       accessToken: {}, // 验证token
       importModal: false,
       action: baseUrl + "/goods/import/import", // 上传接口
@@ -354,7 +356,7 @@ export default {
           key: "price",
           width: 130,
           render: (h, params) => {
-            return h("div", this.$options.filters.unitPrice(params.row.price, "￥"));
+            return h("priceColorScheme", {props:{value:params.row.price,color:this.$mainColor}} );
           },
         },
         {
@@ -489,6 +491,7 @@ export default {
       ],
       data: [], // 表单数据
       total: 0, // 表单数据总数
+      updateStockType: 'updateStock',  // 更新库存状态
     };
   },
   methods: {
@@ -529,6 +532,7 @@ export default {
       getGoodsSkuListDataSeller({ goodsId: id, pageSize: 1000 }).then((res) => {
         if (res.success) {
           this.updateStockModalVisible = true;
+          this.updateStockType = 'updateStock';
           this.stockAllUpdate = undefined;
           this.stockList = res.result.records;
         }
@@ -546,15 +550,12 @@ export default {
     async upload() {
       let fd = new FormData();
       fd.append("files", this.file);
+      this.spinShow = true
       let res = await uploadGoodsExcel(fd);
+      this.spinShow = false
       if (res.success) {
-        this.stepList.map((item) => {
-          item.checked = false;
-          this.$Message.success("导入成功")
-          this.importModal = false
-        });
-
-        this.stepList[2].checked = true;
+        this.$Message.success("导入成功")
+        this.init();
       }
     },
     openImportGoods(){
@@ -563,7 +564,6 @@ export default {
     async exportGoods(){
       downLoadGoods()
         .then((res) => {
-          console.log(res)
           const blob = new Blob([res], {
             type: "application/vnd.ms-excel;charset=utf-8",
           });
@@ -588,21 +588,25 @@ export default {
         });
     },
     // 更新库存
-    updateStock() {
-      let updateStockList = this.stockList.map((i) => {
-        let j = { skuId: i.id, quantity: i.quantity };
-        if (this.stockAllUpdate) {
-          j.quantity = this.stockAllUpdate;
-        }
-        return j;
-      });
-      updateGoodsSkuStocks(updateStockList).then((res) => {
-        if (res.success) {
-          this.updateStockModalVisible = false;
-          this.$Message.success("更新库存成功");
-          this.getDataList();
-        }
-      });
+    updateStock () {
+      if (this.updateStockType === 'updateStock' || this.updateStockType === 'stockAll') {
+        // updateStock 手动规格更新，stockAll 批量规格更新
+        let updateStockList = this.stockList.map((i) => {
+          let j = { skuId: i.id, quantity: i.quantity };
+          if (this.stockAllUpdate) {
+            j.quantity = this.stockAllUpdate;
+          }
+          return j;
+        });
+        updateGoodsSkuStocks(updateStockList).then((res) => {
+          if (res.success) {
+            this.updateStockModalVisible = false;
+            this.$Message.success("更新库存成功");
+            this.getDataList();
+          }
+        });
+      }
+
     },
     // 改变页码
     changePage(v) {

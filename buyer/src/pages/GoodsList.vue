@@ -1,9 +1,8 @@
 <template>
-  <div>
+  <div class="wrapper">
     <BaseHeader></BaseHeader>
     <Search @search="handleSearch"></Search>
-    <drawer></drawer>
-    <cateNav></cateNav>
+
     <div class="container">
       <!-- 商品筛选栏 -->
       <GoodsClassNav @getParams="getParams"></GoodsClassNav>
@@ -49,59 +48,60 @@
               class="goods-show-info"
               v-for="(item, index) in goodsList"
               :key="index"
-              @click="goGoodsDetail(item.id, item.content.goodsId)"
+              @click="goGoodsDetail(item.id, item.goodsId)"
             >
               <div class="goods-show-img">
-                <img width="220" height="220" :src="item.content.thumbnail" />
+                <img width="220" height="220" :src="item.thumbnail" />
               </div>
               <div class="goods-show-price">
                 <span>
                   <span class="seckill-price text-danger">{{
-                    item.content.price | unitPrice("￥")
+                    item.price | unitPrice("￥")
                   }}</span>
                 </span>
               </div>
               <div class="goods-show-detail">
                 <Tag
-                  v-if="item.content.salesModel === 'WHOLESALE'"
+                  v-if="item.salesModel === 'WHOLESALE'"
                   class="goods-show-tag"
                   color="purple"
-                  >
+                >
                   批发
                 </Tag>
-                <span>{{ item.content.goodsName }}</span>
+                <span>{{ item.goodsName }}</span>
               </div>
               <div class="goods-show-num">
-                已有<span>{{ item.content.commentNum || 0 }}</span
+                已有<span>{{ item.commentNum || 0 }}</span
                 >人评价
               </div>
               <div class="goods-show-seller">
-                <Tag
-                  class="goods-show-buyer"
-                  v-if="item.content.selfOperated"
-                  size="default"
-                  color="error"
-                  >自营
-                </Tag>
-                <div class="goods-show-right">
-                  <div
-                    class="goods-show-middle"
-                    v-if="goodsListType.content.goodsType == 'VIRTUAL_GOODS'"
-                  >
-                    虚拟
-                  </div>
-                  <div
-                    class="goods-show-middle"
-                    v-else-if="
-                      goodsListType.content.goodsType == 'PHYSICAL_GOODS'
-                    "
-                  >
-                    实物
-                  </div>
-                </div>
                 <span class="text-bottom" style="color: #e4393c">{{
-                  item.content.storeName
+                  item.storeName
                 }}</span>
+              </div>
+
+              <div class="goods-show-right">
+                <Tag
+                  class="goods-show-tag"
+                  color="red"
+                  v-if="item.selfOperated"
+                >
+                  自营
+                </Tag>
+                <Tag
+                  class="goods-show-tag"
+                  color="blue"
+                  v-if="item.goodsType === 'VIRTUAL_GOODS'"
+                >
+                  虚拟
+                </Tag>
+                <Tag
+                  class="goods-show-tag"
+                  color="blue"
+                  v-else-if="item.goodsType === 'PHYSICAL_GOODS'"
+                >
+                  实物
+                </Tag>
               </div>
             </div>
           </div>
@@ -145,7 +145,6 @@ export default {
       ],
       goodsList: [], // 商品列表
       loading: false, // 加载状态
-      goodsListType: "",
       total: 0, // 列表总数
       params: {
         // 请求参数
@@ -158,19 +157,28 @@ export default {
   watch: {
     $route() {
       const keyword = this.$route.query.keyword;
-      this.handleSearch(keyword);
+      if (keyword) {
+        this.handleSearch(keyword);
+      }
       if (this.$route.query.categoryId) {
         let cateId = this.$route.query.categoryId.split(",");
         Object.assign(this.params, this.$route.query);
         this.params.categoryId = cateId[cateId.length - 1];
-        this.getGoodsList();
       }
+      if (this.$route.query.promotionType) {
+        this.params.promotionType = this.$route.query.promotionType;
+      }
+      if (this.$route.query.promotionsId) {
+        this.params.promotionsId = this.$route.query.promotionsId;
+      }
+      this.getGoodsList();
     },
   },
   methods: {
     // 搜索
     handleSearch(key) {
       this.params.keyword = key;
+      this.$route.query.keyword = key
       this.params.pageNumber = 0;
       this.getGoodsList();
     },
@@ -221,11 +229,8 @@ export default {
         .then((res) => {
           this.loading = false;
           if (res.success) {
-            this.goodsList = res.result.content;
-            this.total = res.result.totalElements;
-            for (var i = 0; i < this.goodsList.length; i++) {
-              this.goodsListType = this.goodsList[i];
-            }
+            this.goodsList = res.result.records;
+            this.total = res.result.total;
           }
         })
         .catch(() => {
@@ -256,12 +261,16 @@ export default {
 
 <style scoped lang="scss">
 @import "../assets/styles/goodsList.scss";
+.cate-nav{
+  margin-top: 10px;
+}
 .goods-show-info > .goods-show-seller > .goods-show-buyer {
-  height: 16px;
-  width: 30px;
+  width: 35px;
+  height: 17px;
   white-space: nowrap;
   line-height: 17px;
   text-align: center;
+  align-content: center;
   padding: 0 3px;
   background-color: #e23a3a;
 }
@@ -281,8 +290,8 @@ export default {
   vertical-align: middle;
 }
 .container {
-  margin: 15px auto;
-  width: 1200px;
+  margin:25px auto 15px auto;
+  width: 1184px;
   min-width: 1000px;
   position: relative;
 }
@@ -293,72 +302,14 @@ export default {
   display: flex;
 }
 /* ---------------侧边广告栏开始------------------- */
-.as-box {
-  width: 200px;
-  border: 1px solid #ccc;
-}
+
 .goods-show-right {
-  width: 35px;
-  height: 17px;
-  // vertical-align:middle;
-  overflow: hidden;
-  margin-top: 1.5px;
-  margin-right: 5px;
-  line-height: 16px;
-  background: white;
-  border-radius: 4px;
-  margin-bottom: 5px;
-  float: left;
-  text-align: center;
-  border: 1px solid rgba(112, 123, 187, 0.8);
-  color: rgba(112, 123, 187, 0.8);
-}
-.goods-show-middle:hover {
-  color: rgba(2, 15, 88, 0.6);
-  border: 0.2px solid rgba(0, 13, 87, 0.6);
-  border-radius: 4px;
-  line-height: 18px;
-}
-.item-as-title {
-  width: 100%;
-  height: 36px;
-  color: $theme_color;
-  line-height: 36px;
-  font-size: 18px;
-}
-.item-as-title span:first-child {
-  margin-left: 20px;
-}
-.item-as-title span:last-child {
-  float: right;
-  margin-right: 15px;
-  font-size: 10px;
-  color: rgb(204, 204, 204);
-}
-.item-as {
-  width: 160px;
-  margin: 18px auto;
-}
-.item-as-img {
-  width: 160px;
-  height: 160px;
-  margin: 0px auto;
-}
-.item-as-price span {
-  font-size: 18px;
-}
-.item-as-intro {
+  display: flex;
+  flex-direction: row;
   margin-top: 5px;
-  font-size: 12px;
 }
-.item-as-selled {
-  margin-top: 5px;
-  font-size: 12px;
-}
-.item-as-selled span {
-  color: #005aa0;
-}
-/* ---------------侧边广告栏结束------------------- */
+
+
 
 /* ---------------商品栏开始------------------- */
 .goods-list-box {

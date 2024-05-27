@@ -2,7 +2,7 @@
   <div>
     <BaseHeader></BaseHeader>
     <Search></Search>
-    <cateNav></cateNav>
+
     <div class="title-bg"><p>文章帮助中心</p></div>
     <div class="container width_1200">
       <Layout class="layoutAll">
@@ -182,7 +182,6 @@ export default {
   text-align: center;
 }
 .title-bg{
-  border-top: 3px solid $theme_color;
   height: 100px;
   width: 100%;
   background-color: #7b7b7b;

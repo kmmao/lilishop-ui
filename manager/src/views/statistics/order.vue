@@ -59,7 +59,7 @@
                 <div class="card-item">
                   <div class="card-item-label">下单金额</div>
                   <div class="card-item-value">
-                    {{ overViewList.orderAmount | unitPrice("￥") }}
+                    {{ overViewList.orderAmount || 0 | unitPrice("￥") }}
                   </div>
                 </div>
                 <div class="card-item">
@@ -77,7 +77,7 @@
                 <div class="card-item">
                   <div class="card-item-label">付款金额</div>
                   <div class="card-item-value">
-                    {{ overViewList.paymentAmount | unitPrice("￥") }}
+                    {{ overViewList.paymentAmount || 0 | unitPrice("￥") }}
                   </div>
                 </div>
               </div>
@@ -172,18 +172,20 @@
         <div>
           <Table stripe :columns="columns" :data="data"></Table>
         </div>
+        <!-- (index) => {
+              refundParams.pageNumber = index;
+            } -->
+        <!-- (size) => {
+              (refundParams.pageSize = size), (refundParams.pageNumber = 1);
+            } -->
         <Page
           v-if="showRecords"
           size="small"
           @on-change="
-            (index) => {
-              refundParams.pageNumber = index;
-            }
+            pageNumberChange
           "
           @on-page-size-change="
-            (size) => {
-              (refundParams.pageSize = size), (refundParams.pageNumber = 1);
-            }
+            pageSizeChange
           "
           class="mt_10"
           show-total
@@ -215,7 +217,7 @@ export default {
         UNPAID: "未付款",
         PAID: "已付款",
         DELIVERED: "已发货",
-        CANCELLED: "已取消",
+        CANCELLED: "已关闭",
         COMPLETED: "已完成",
         TAKE: "已完成",
       },
@@ -292,10 +294,7 @@ export default {
           title: "价格",
           key: "flowPrice",
           render: (h, params) => {
-            return h(
-              "div",
-              this.$options.filters.unitPrice(params.row.flowPrice, "￥")
-            );
+            return h("priceColorScheme", {props:{value:params.row.flowPrice,color:this.$mainColor}} );
           },
         },
         {
@@ -381,11 +380,7 @@ export default {
           title: "申请退款金额",
           key: "applyRefundPrice",
           render: (h, params) => {
-            return h(
-              "div",
-              "￥" +
-                (params.row.applyRefundPrice ? params.row.applyRefundPrice : 0)
-            );
+            return h("priceColorScheme", {props:{value:params.row.applyRefundPrice,color:this.$mainColor}} );
           },
         },
         {
@@ -398,7 +393,7 @@ export default {
           render: (h, params) => {
             return h(
               "div",
-              this.$options.filters.unitPrice(params.row.flowPrice, "￥")
+              this.$options.filters.unitPrice(params.row.flowPrice?params.row.flowPrice:0, "￥")
             );
           },
         },
@@ -459,12 +454,12 @@ export default {
           value: "YESTERDAY",
         },
         {
-          title: "最近7天",
+          title: "过去7天",
           selected: true,
           value: "LAST_SEVEN",
         },
         {
-          title: "最近30天",
+          title: "过去30天",
           selected: false,
           value: "LAST_THIRTY",
         },
@@ -530,6 +525,14 @@ export default {
     },
   },
   methods: {
+    pageNumberChange(val){
+      this.refundParams.pageNumber = val
+      this.getOrderList();
+    },
+    pageSizeChange(val){
+      this.refundParams.pageSize = val
+      this.getOrderList();
+    },
     // 订单图
     initOrderChart() {
       // 默认已经加载 legend-filter 交互
@@ -570,11 +573,13 @@ export default {
 
     clickBreadcrumb(item, index) {
       let callback = JSON.parse(JSON.stringify(item));
-
+      console.log("callback",callback)
       this.orderParams = callback;
 
       this.overViewParams = callback;
       this.refundParams = callback;
+      this.refundParams.pageNumber = 1
+      this.refundParams.pageSize = 10
     },
 
     // 实例化订单概览
@@ -586,6 +591,7 @@ export default {
     },
     // 实例化订单图表
     async initOrderChartList(name) {
+      this.orderChart ? this.orderChart.clear() : ''
       const res = await API_Goods.getOrderChart(this.orderParams);
       if (res.success) {
         this.chartList = res.result;

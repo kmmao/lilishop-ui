@@ -134,12 +134,13 @@
         ></liliDialog>
         <!-- 选择图片 -->
         <Modal width="1200px" v-model="picModelFlag" footer-hide>
-            <ossManage @callback="callbackSelected" :isComponent="true" ref="ossManage" />
+            <ossManage @callback="callbackSelected" :isComponent="true" :initialize="picModelFlag" ref="ossManage" />
         </Modal>
     </div>
 </template>
 <script>
-import ossManage from "@/views/sys/oss-manage/ossManage";
+// import ossManage from "@/views/sys/oss-manage/ossManage";
+import ossManage from "@/views/shop/ossManages";
 export default {
     props:{
         data:{

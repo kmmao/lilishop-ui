@@ -3,7 +3,8 @@
     <Form ref="formValidate" :label-width="150" label-position="right" :model="formValidate" :rules="ruleValidate">
 
       <FormItem label="站点名称" prop="siteName">
-        <Input v-model="formValidate.siteName" />
+        <Input style="width:200px;" v-model="formValidate.siteName" />
+        <span class="desc">配置买家端站点名称</span>
       </FormItem>
       <FormItem label="icp" prop="icp">
 
@@ -16,6 +17,16 @@
           <img v-if="formValidate.domainLogo" class="img" :src="formValidate.domainLogo" />
           <img v-else class="img" src="../../../../assets/emptyImg.png" alt="">
           <Button @click="onClickImg('domainLogo')">选择图片</Button>
+           <span class="desc">后台管理左上角logo展示 	17∶6</span>
+        </div>
+      </FormItem>
+      <FormItem label="后台Icon" prop="domainIcon">
+        <div class="label-item-upload">
+
+          <img v-if="formValidate.domainIcon" class="img" :src="formValidate.domainIcon" />
+          <img v-else class="img" src="../../../../assets/emptyImg.png" alt="">
+          <Button @click="onClickImg('domainIcon')">选择图片</Button>
+            <span class="desc">后台管理网站icon展示 	1∶1</span>
         </div>
       </FormItem>
       <FormItem label="买家端Logo" prop="buyerSideLogo">
@@ -23,6 +34,15 @@
           <img v-if="formValidate.buyerSideLogo" class="img" :src="formValidate.buyerSideLogo" />
           <img v-else class="img" src="../../../../assets/emptyImg.png" alt="">
           <Button @click="onClickImg('buyerSideLogo')">选择图片</Button>
+           <span class="desc">买家端logo展示 	17∶6</span>
+        </div>
+      </FormItem>
+      <FormItem label="买家端Icon" prop="buyerSideIcon">
+        <div class="label-item-upload">
+          <img v-if="formValidate.buyerSideIcon" class="img" :src="formValidate.buyerSideIcon" />
+          <img v-else class="img" src="../../../../assets/emptyImg.png" alt="">
+          <Button @click="onClickImg('buyerSideIcon')">选择图片</Button>
+            <span class="desc">买家端网站icon展示 	1∶1</span>
         </div>
       </FormItem>
       <FormItem label="商家端Logo" prop="storeSideLogo">
@@ -30,11 +50,21 @@
           <img v-if="formValidate.storeSideLogo" class="img" :src="formValidate.storeSideLogo" />
           <img v-else class="img" src="../../../../assets/emptyImg.png" alt="">
           <Button @click="onClickImg('storeSideLogo')">选择图片</Button>
+          <span class="desc">商家端logo展示 	17∶6</span>
+        </div>
+      </FormItem>
+      <FormItem label="商家端Icon" prop="storeSideIcon">
+        <div class="label-item-upload">
+          <img v-if="formValidate.storeSideIcon" class="img" :src="formValidate.storeSideIcon" />
+          <img v-else class="img" src="../../../../assets/emptyImg.png" alt="">
+          <Button @click="onClickImg('storeSideIcon')">选择图片</Button>
+           <span class="desc">商家端icon展示 	1∶1</span>
         </div>
       </FormItem>
 
       <FormItem label="站点地址" prop="staticPageAddress">
-        <Input v-model="formValidate.staticPageAddress" />
+        <Input  style="width:200px;" v-model="formValidate.staticPageAddress" />
+
       </FormItem>
       <FormItem label="wap站点地址" prop="staticPageWapAddress">
         <Input v-model="formValidate.staticPageWapAddress" />
@@ -45,7 +75,7 @@
       </div>
     </Form>
     <Modal width="1200px" v-model="picModelFlag">
-      <ossManage @callback="callbackSelected" ref="ossManage" />
+      <ossManage @callback="callbackSelected" :isComponent="true" :initialize="picModelFlag" ref="ossManage" />
     </Modal>
 
   </div>
@@ -57,7 +87,10 @@ import ossManage from "@/views/sys/oss-manage/ossManage";
 export default {
   title: "基础设置",
   props: {
-    res:Object,
+    res:{
+      type:null,
+      default:""
+    },
     type:''
   },
   components: {
@@ -78,7 +111,8 @@ export default {
         staticPageWapAddress: "",
       },
       selected: "", // 已选数据
-      ruleValidate: {} // 验证规则
+      ruleValidate: {}, // 验证规则
+      result:""
     };
   },
   created() {
@@ -109,6 +143,7 @@ export default {
           this.$Message.success("保存成功!");
           localStorage.setItem("icon", this.formValidate.domainLogo);
           window.document.title = this.formValidate.siteName + " - 运营后台";
+          this.setStore("title", this.formValidate.siteName);
         } else {
           this.$Message.error("保存失败!");
         }
@@ -116,10 +151,9 @@ export default {
     },
     /**添加必填项 */
     init() {
-      this.res = JSON.parse(this.res);
-
-      this.$set(this, "formValidate", { ...this.res });
-      Object.keys(this.res).forEach((item) => {
+      this.result = JSON.parse(this.res);
+      this.$set(this, "formValidate", { ...this.result });
+      Object.keys(this.result).forEach((item) => {
         this.ruleValidate[item] = [
           {
             required: true,

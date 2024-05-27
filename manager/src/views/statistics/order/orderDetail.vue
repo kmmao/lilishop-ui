@@ -74,7 +74,10 @@
       <div class="count-price">
         <div class="label-item">
           <span>总价格</span>
-          <span class="flowPrice">{{ res.flowPrice | unitPrice("￥") }}</span>
+          <span class="flowPrice">
+            <priceColorScheme :value="row.flowPrice" :color="$mainColor"></priceColorScheme>
+
+          </span>
         </div>
       </div>
     </div>
@@ -90,7 +93,7 @@ export default {
         UNPAID: "未付款",
         PAID: "已付款",
         DELIVERED: "已发货",
-        CANCELLED: "已取消",
+        CANCELLED: "已关闭",
         COMPLETED: "已完成",
         TAKE: "已完成",
       },

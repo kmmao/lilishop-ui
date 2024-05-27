@@ -6,6 +6,19 @@
           <div class="div-form-default">
             <h3>退货申请</h3>
             <dl>
+              <dt>退货商品</dt>
+              <dd>
+                <div>
+                  <img :src="afterSaleInfo.goodsImage" style="height: 60px">
+                </div>
+                <a @click="linkTo(afterSaleInfo.goodsId, afterSaleInfo.skuId)">{{ afterSaleInfo.goodsName }}
+                </a><br>
+
+                <span>{{ afterSaleInfo.num }}(数量)</span>
+
+              </dd>
+            </dl>
+            <dl>
               <dt>退货状态</dt>
               <dd>{{ afterSaleInfo.serviceName }}</dd>
             </dl>
@@ -19,11 +32,15 @@
             </dl>
             <dl>
               <dt>申请退款金额</dt>
-              <dd>￥{{ afterSaleInfo.applyRefundPrice | unitPrice }}</dd>
+              <dd>
+                <priceColorScheme :value="afterSaleInfo.applyRefundPrice" :color="$mainColor"></priceColorScheme>
+              </dd>
             </dl>
             <dl v-if="afterSaleInfo.actualRefundPrice">
               <dt>实际退款金额</dt>
-              <dd>￥{{ afterSaleInfo.actualRefundPrice | unitPrice }}</dd>
+              <dd>
+                <priceColorScheme :value="afterSaleInfo.applyRefundPrice" :color="$mainColor"></priceColorScheme>
+              </dd>
             </dl>
             <dl v-if="afterSaleInfo.refundPoint">
               <dt>退还积分</dt>
@@ -79,12 +96,14 @@
             </dl>
             <dl>
               <dt>申请退款金额</dt>
-              <dd>{{ afterSaleInfo.applyRefundPrice | unitPrice("￥") }}</dd>
+              <dd>
+                <priceColorScheme :value="afterSaleInfo.applyRefundPrice" :color="$mainColor"></priceColorScheme>
+              </dd>
             </dl>
             <dl>
               <dt>实际退款金额</dt>
               <dd>
-                <Input v-model="params.actualRefundPrice" style="width: 260px" />
+                <InputNumber :min="0" v-model="params.actualRefundPrice" style="width: 260px" />
               </dd>
             </dl>
             <dl>
@@ -149,43 +168,6 @@
         </div>
         <div class="div-flow-center"></div>
         <div class="div-flow-right">
-          <div class="div-form-default">
-            <h3>相关商品交易信息</h3>
-            <dl>
-              <dt>
-                <img :src="afterSaleInfo.goodsImage" height="60px" />
-              </dt>
-              <dd>
-                <div class="div-zoom">
-                  <a @click="linkTo(afterSaleInfo.goodsId, afterSaleInfo.skuId)">{{
-                    afterSaleInfo.goodsName
-                  }}</a>
-                  <Poptip trigger="hover" title="扫码在手机中查看" transfer>
-                    <div slot="content">
-                      <vue-qr
-                        :text="wapLinkTo(afterSaleInfo.goodsId, afterSaleInfo.skuId)"
-                        :margin="0"
-                        colorDark="#000"
-                        colorLight="#fff"
-                        :size="150"
-                      ></vue-qr>
-                    </div>
-                    <img
-                      src="../../../assets/qrcode.svg"
-                      style="vertical-align: middle"
-                      class="hover-pointer ml_10"
-                      width="20"
-                      height="20"
-                      alt=""
-                    />
-                  </Poptip>
-                </div>
-                <div style="color: #999; font-size: 10px">
-                  数量：x{{ afterSaleInfo.num }}
-                </div>
-              </dd>
-            </dl>
-          </div>
           <div class="div-form-default">
             <h3>订单相关信息</h3>
             <dl>
@@ -334,7 +316,7 @@
           </dd>
         </dl>
         <dl>
-          <dt>快递单号：</dt>
+          <dt>物流单号：</dt>
           <dd>
             <div class="text-box">{{ afterSaleInfo.mlogisticsNo }}</div>
           </dd>

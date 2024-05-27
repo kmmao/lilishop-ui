@@ -15,7 +15,7 @@ export function unitPrice(val, unit, location) {
   }
   return (unit || '') + price
 }
-// 转义 
+// 转义
 export function enCode(v1) {
   var entry = {
     "&#39;": "'",
@@ -30,6 +30,25 @@ export function enCode(v1) {
   });
 
   return v1;
+}
+
+import {router} from "@/router/index";
+/**
+ * 自定义跳转
+ */
+export function customRouterPush(push){
+  const setting = window.localStorage.getItem('admin-setting') ? JSON.parse(window.localStorage.getItem('admin-setting')) : {};
+
+  if(setting.isUseTabsRouter){
+    router.push(push)
+  }
+  else{
+    if(Object.keys(setting).length == 0){router.push(push)}
+    else{
+      let url = router.resolve(push);
+      window.open(url.href, '_blank');
+    }
+  }
 }
 
 
@@ -218,13 +237,15 @@ export function formatDate(date, fmt) {
 
 // 楼层装修，选择链接处理跳转方式
 export function formatLinkType (item) {
-  const types = ['goods', 'category', 'shops', 'marketing', 'pages', 'other'] // 所有跳转的分类 依次为 商品、分类、店铺、活动、页面、其他
+  const types = ['goods', 'category', 'shops', 'marketing', 'pages', 'other','special'] // 所有跳转的分类 依次为 商品、分类、店铺、活动、页面、其他
   let url = '';
   switch (item.___type) {
     case 'goods':
       url =  `/goodsDetail?skuId=${item.id}&goodsId=${item.goodsId}`;
       break;
-
+    case 'special':
+      url = `/topic?id=${item.id}`
+      break;
     case 'category':
       url = `/goodsList?categoryId=${item.allId}`;
       break;

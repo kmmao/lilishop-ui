@@ -30,6 +30,7 @@
         size="small"
         >取消订单</Button
       >
+      <Button v-if="order.allowOperationVO.showLogistics || orderPackage.length > 0 || logistics" type="info" @click="logisticsList()" size="small">查看物流</Button>
     </Card>
     <p class="verificationCode" v-if="order.order.verificationCode">
       核验码：<span>{{ order.order.verificationCode }}</span>
@@ -53,7 +54,7 @@
         ></Step>
       </Steps>
     </div>
-    <div class="order-card">
+    <div class="order-card" v-if="order.order.deliveryMethod === 'LOGISTICS' && order.order.orderType !== 'VIRTUAL'">
       <h3>收货人信息</h3>
       <p>收货人：{{ order.order.consigneeName }}</p>
       <p>手机号码：{{ order.order.consigneeMobile | secrecyMobile }}</p>
@@ -62,15 +63,20 @@
         {{ order.order.consigneeDetail }}
       </p>
     </div>
+    <div class="order-card" v-if="order.order.deliveryMethod === 'SELF_PICK_UP'">
+      <h3>自提点信息</h3>
+      <p>自提点名称：{{ order.order.storeAddressPath }}</p>
+      <p>联系方式：{{ order.order.storeAddressMobile }}</p>
+    </div>
     <div class="order-card">
       <h3>付款信息</h3>
       <p>支付方式：{{ order.paymentMethodValue }}</p>
       <p>付款状态：{{ order.payStatusValue }}</p>
     </div>
-    <div class="order-card" v-if="!order.order.verificationCode">
+    <div class="order-card" v-if="!order.order.verificationCode && order.order.orderType !== 'VIRTUAL'">
       <h3>配送信息</h3>
       <p>配送方式：{{ order.deliveryMethodValue }}</p>
-      <p>配送状态：{{ order.deliverStatusValue }}</p>
+      <p v-if="order.order.deliveryMethod === 'LOGISTICS'">配送状态：{{ order.deliverStatusValue }}</p>
       <p v-if="logistics">
         物流信息：{{ logistics.shipper || "暂无物流信息" }}
       </p>
@@ -89,7 +95,7 @@
     </div>
     <div class="order-card" v-if="order.order.payStatus === 'PAID'">
       <h3>发票信息</h3>
-      <template v-if="order.order.needReceipt">
+      <template v-if="order.order.needReceipt && order.receipt">
         <p>发票抬头：{{ order.receipt.receiptTitle }}</p>
         <p>发票内容：{{ order.receipt.receiptContent }}</p>
         <p v-if="order.receipt.taxpayerId">
@@ -101,17 +107,17 @@
     <!-- 订单商品 -->
     <div class="goods">
       <div class="shop-name">
-        <span @click="shopPage(order.order.storeId)">{{
-          order.order.storeName
-        }}</span>
+        <span @click="shopPage(order.order.storeId)">{{order.order.storeName}}</span>
       </div>
       <table>
         <thead>
           <tr>
-            <th width="40%">商品</th>
-            <th width="20%">货号</th>
+            <th width="30%">商品</th>
+            <th width="15%">货号</th>
             <th width="10%">单价</th>
-            <th width="10%">数量</th>
+            <th width="5%">数量</th>
+            <th width="10%">退款状态</th>
+            <th width="10%">实际退款金额</th>
             <th width="10%">小计</th>
             <th width="10%">操作</th>
           </tr>
@@ -136,6 +142,8 @@
             <td>{{ goods.id }}</td>
             <td>{{ goods.goodsPrice | unitPrice("￥") }}</td>
             <td>{{ goods.num }}</td>
+            <td>{{refundPriceList(goods.isRefund)}}</td>
+            <td>{{ goods.refundPrice | unitPrice("￥") }}</td>
             <td>{{ (goods.goodsPrice * goods.num) | unitPrice("￥") }}</td>
             <td>
               <Button
@@ -179,7 +187,7 @@
           ><span>{{ order.order.goodsPrice | unitPrice("￥") }}</span
           ><br />
         </div>
-        <div>
+        <div v-if="order.order.orderType !== 'VIRTUAL'">
           <span>运费：</span
           ><span>+{{ order.order.freightPrice | unitPrice("￥") }}</span
           ><br />
@@ -195,6 +203,10 @@
         <div v-if="order.order.discountPrice">
           <span>活动优惠：</span
           ><span>-{{ order.order.discountPrice | unitPrice("￥") }}</span>
+        </div>
+        <div v-if="order.order.priceDetailDTO.updatePrice">
+          <span>修改价格：</span
+          ><span>{{ order.order.priceDetailDTO.updatePrice | unitPrice("￥") }}</span>
         </div>
         <div>
           <span>应付金额：</span>
@@ -221,6 +233,70 @@
         </Radio>
       </RadioGroup>
     </Modal>
+
+    <!--查询物流-->
+    <Modal v-model="logisticsModal" width="40">
+      <p slot="header"><span>查询物流</span></p>
+      <div class="layui-layer-wrap">
+        <dl>
+          <dt>订单号：</dt>
+          <dd><div class="text-box">{{ order.order.sn }}</div></dd>
+        </dl>
+      </div>
+      <div v-if="orderPackage.length > 0" v-for="(packageItem, packageIndex) in orderPackage" :key="packageIndex">
+        <div class="layui-layer-wrap">
+          <dl><dt>物流公司：</dt>
+            <dd><div class="text-box">{{ packageItem.logisticsName }}</div></dd>
+          </dl>
+          <dl><dt>快递单号：</dt>
+            <dd><div nctype="ordersSn" class="text-box">{{ packageItem.logisticsNo }}</div></dd>
+          </dl>
+          <div class="div-express-log">
+            <ul class="express-log express-log-name">
+              <li v-for="(item, index) in packageItem.orderPackageItemList" :key="index">
+                <span class="time" style="width: 50%;"><span>商品名称：</span><span>{{ item.goodsName }}</span></span>
+                <span class="time" style="width: 30%;"><span>发货时间：</span><span>{{ item.logisticsTime }}</span></span>
+                <span class="time" style="width: 20%;"><span>发货数量：</span><span>{{ item.deliverNumber }}</span></span>
+              </li>
+            </ul>
+            <div class="div-express-log" style="overflow: hidden;">
+              <ul class="express-log" v-if="packageItem.traces && packageItem.traces.traces">
+                <li v-for="(item, index) in packageItem.traces.traces" :key="index">
+                  <span class="time">{{ item.AcceptTime || item.acceptTime }}</span>
+                  <span class="detail">{{ item.AcceptStation || item.remark }}</span>
+                </li>
+              </ul>
+              <ul class="express-log" v-else><li>暂无物流信息</li></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div v-if = "orderPackage.length == 0 && logistics">
+        <div class="layui-layer-wrap">
+          <dl>
+            <dt>物流公司：</dt>
+            <dd><div class="text-box">{{ logistics.shipper }}</div></dd>
+          </dl>
+          <dl>
+            <dt>快递单号：</dt>
+            <dd><div nctype="ordersSn" class="text-box">{{ logistics.logisticCode }}</div></dd>
+          </dl>
+          <div class="div-express-log">
+            <ul class="express-log" v-if="logistics && logistics.traces">
+              <li v-for="(item, index) in logistics.traces" :key="index">
+                <span class="time">{{ item.AcceptTime }}</span>
+                <span class="detail">{{ item.AcceptStation }}</span>
+              </li>
+            </ul>
+            <ul class="express-log" v-else><li>暂无物流信息</li></ul>
+          </div>
+        </div>
+      </div>
+      <div slot="footer" style="text-align: right">
+        <Button @click="logisticsModal = false">取消</Button>
+      </div>
+    </Modal>
+
   </div>
 </template>
 <script>
@@ -229,6 +305,7 @@ import {
   getTraces,
   sureReceived,
   cancelOrder,
+  getPackage
 } from "@/api/order.js";
 import { afterSaleReason } from "@/api/member";
 export default {
@@ -245,9 +322,27 @@ export default {
       },
       cancelAvail: false, // 取消订单modal控制
       cancelReason: [], // 取消订单原因
+      orderPackage: [],
+      packageTraceList: [],
+      logisticsModal: false,
     };
   },
   methods: {
+    // 退款状态枚举
+    refundPriceList(status) {
+      switch (status) {
+      case 'ALL_REFUND':
+        return "全部退款";
+      case 'PART_REFUND':
+        return "部分退款";
+      case 'NO_REFUND':
+        return "未退款";
+      case 'REFUNDING':
+        return "退款中";
+      default:
+          return "未退款";
+      }
+    },
     goodsDetail(skuId, goodsId) {
       // 跳转商品详情
       let routeUrl = this.$router.resolve({
@@ -270,8 +365,19 @@ export default {
         if (res.success) {
           this.order = res.result;
           this.progressList = res.result.orderLogs;
+          if (this.order.order.deliveryMethod === 'LOGISTICS') {
+            this.getOrderPackage(this.order.order.sn);
+            this.traces();
+          }
         }
       });
+    },
+    getOrderPackage(sn) {
+      getPackage(sn).then(res => {
+        if (res.success) {
+          this.orderPackage = res.result
+        }
+      })
     },
     traces() {
       // 物流信息
@@ -280,6 +386,15 @@ export default {
           this.logistics = res.result;
         }
       });
+    },
+    logisticsList() {
+      this.logisticsModal = true;
+      this.packageTraceList = this.orderPackage;
+      // getTracesList(this.order.order.sn).then((res) => {
+      //   if (res.success && res.result != null) {
+      //     this.packageTraceList = res.result;
+      //   }
+      // });
     },
     received(sn) {
       // 确认收货
@@ -336,7 +451,6 @@ export default {
   },
   mounted() {
     this.getDetail();
-    this.traces();
   },
 };
 </script>
@@ -455,5 +569,121 @@ table {
 /** 订单进度条 */
 .progress {
   margin: 15px 0;
+}
+
+.layui-layer-wrap {
+  dl {
+    border-top: solid 1px #f5f5f5;
+    margin-top: -1px;
+    overflow: hidden;
+
+    dt {
+      font-size: 14px;
+      line-height: 28px;
+      display: inline-block;
+      padding: 8px 1% 8px 0;
+      color: #999;
+    }
+
+    dd {
+      font-size: 14px;
+      line-height: 28px;
+      display: inline-block;
+      padding: 8px 0 8px 8px;
+      border-left: solid 1px #f5f5f5;
+
+      .text-box {
+        line-height: 40px;
+        color: #333;
+        word-break: break-all;
+      }
+    }
+  }
+}
+
+.layui-layer-wrap > .div-express-log {
+  max-height: 300px;
+}
+/deep/ .layui-layer-wrap > .div-express-log::-webkit-scrollbar{
+  width: 1px;
+  height: 5px;
+}
+/deep/ .layui-layer-wrap > .div-express-log::-webkit-scrollbar-thumb{
+  border-radius: 1em;
+  background-color: rgba(50,50,50,.3);
+}
+/deep/ .layui-layer-wrap > .div-express-log::-webkit-scrollbar-track{
+  border-radius: 1em;
+  background-color: rgba(50,50,50,.1);
+}
+
+
+.div-express-log {
+  max-height: 300px;
+  border: solid 1px #e7e7e7;
+  background: #fafafa;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+.express-log {
+  /*margin: 5px -10px 5px 5px;*/
+  padding: 10px;
+  list-style-type: none;
+
+  .time {
+    width: 30%;
+    display: inline-block;
+    float: left;
+  }
+
+  .detail {
+    width: 60%;
+    margin-left: 30px;
+    display: inline-block;
+  }
+
+  li {
+    line-height: 30px;
+  }
+}
+
+.express-log-name {
+  li {
+    display: flex;
+    span  {
+      display: flex;
+    }
+  }
+}
+
+.layui-layer-wrap {
+  dl {
+    border-top: solid 1px #f5f5f5;
+    margin-top: -1px;
+    overflow: hidden;
+
+    dt {
+      font-size: 14px;
+      line-height: 28px;
+      display: inline-block;
+      padding: 8px 1% 8px 0;
+      color: #999;
+    }
+
+    dd {
+      font-size: 14px;
+      line-height: 28px;
+      display: inline-block;
+      padding: 8px 0 8px 8px;
+      border-left: solid 1px #f5f5f5;
+
+      .text-box {
+        line-height: 40px;
+        color: #333;
+        word-break: break-all;
+      }
+    }
+  }
 }
 </style>

@@ -19,4 +19,9 @@ module.exports = {
   website: "https://www.zmddg.com", //官网地址
   enableCDN: true, //生产环境 是否启用cdn加载 vue等js
   port: 10003, //端口
+  inputMaxLength:'140', //全局输入框默认最大输入长度字
+  mainColor:"#ff5c58", //主题色
+  setting: {
+    isUseTabsRouter: true, //多标签Tab页模式
+  },
 };

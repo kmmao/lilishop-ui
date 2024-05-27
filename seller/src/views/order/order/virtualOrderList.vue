@@ -107,11 +107,10 @@ export default {
           minWidth: 100,
           tooltip: true,
           render: (h, params) => {
-            return h(
-              "div",
-              this.$options.filters.unitPrice(params.row.flowPrice, "￥")
-            );
+            return h("priceColorScheme", {props:{value:params.row.flowPrice,color:this.$mainColor}} );
           },
+
+
         },
 
         {
@@ -253,10 +252,10 @@ export default {
     // 跳转详情
     detail(v) {
       let sn = v.sn;
-      this.$router.push({
+      this.$options.filters.customRouterPush({
         name: "order-detail",
         query: { sn: sn },
-      });
+      })
     },
   },
   mounted() {

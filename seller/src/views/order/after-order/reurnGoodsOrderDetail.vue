@@ -8,8 +8,15 @@
             <div class="div-form-default">
               <h3>售后申请</h3>
               <dl>
-                <dt>售后状态</dt>
-                <dd>{{filterStatus(afterSaleInfo.serviceStatus)}}</dd>
+                <dt>售后商品</dt>
+                <dd>
+                  <div>
+                    <img :src="afterSaleInfo.goodsImage" style="height: 60px">
+                  </div>
+                  <a>{{ afterSaleInfo.goodsName }}</a><br>
+                  <span>{{ afterSaleInfo.num }}(数量)</span>
+                </dd>
+
               </dl>
 
               <dl>
@@ -22,7 +29,9 @@
               </dl>
               <dl>
                 <dt>申请退款金额</dt>
-                <dd>{{ afterSaleInfo.applyRefundPrice | unitPrice('￥') }}</dd>
+                <dd>
+                  <priceColorScheme :value="afterSaleInfo.applyRefundPrice" :color="$mainColor" />
+                </dd>
               </dl>
               <dl v-if="afterSaleInfo.actualRefundPrice">
                 <dt>实际退款金额</dt>
@@ -89,12 +98,14 @@
 
               <dl>
                 <dt>申请退款金额</dt>
-                <dd>{{ afterSaleInfo.applyRefundPrice | unitPrice('￥') }}</dd>
+                <dd>
+                  <priceColorScheme :value="afterSaleInfo.applyRefundPrice" :color="$mainColor" />
+                </dd>
               </dl>
               <dl v-if="params.serviceStatus == 'PASS'">
                 <dt>实际退款金额</dt>
                 <dd>
-                  <Input v-model="params.actualRefundPrice" style="width:260px" />
+                  <InputNumber :min="0" v-model="params.actualRefundPrice" style="width:260px" />
                 </dd>
               </dl>
               <dl>
@@ -175,20 +186,6 @@
 
           </div>
           <div class="div-flow-right">
-            <div class="div-form-default">
-              <h3>相关商品交易信息</h3>
-              <dl>
-                <dt>
-                  <img :src="afterSaleInfo.goodsImage" height="60px">
-                </dt>
-                <dd>
-                  <a>{{ afterSaleInfo.goodsName }}</a><br>
-                  <span>{{ afterSaleInfo.num }}(数量)</span><br>
-
-                </dd>
-              </dl>
-
-            </div>
             <div class="div-form-default">
               <h3>订单相关信息</h3>
               <dl>
@@ -372,7 +369,7 @@
           </dd>
         </dl>
         <dl>
-          <dt>快递单号：</dt>
+          <dt>物流单号：</dt>
           <dd>
             <div nctype="ordersSn" class="text-box">{{ logisticsInfo.logisticCode }}</div>
           </dd>

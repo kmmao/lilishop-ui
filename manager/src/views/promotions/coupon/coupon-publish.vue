@@ -136,7 +136,7 @@
             <FormItem label="有效期" prop="rangeTime">
               <div>
                 <RadioGroup v-model="rangeTimeType">
-                  <Radio :disabled="disabled" :label="1">起止时间</Radio>
+                  <Radio :disabled="disabled" :label="1" v-if="form.getType !== 'ACTIVITY'">起止时间</Radio>
                   <Radio :disabled="disabled" :label="0">固定时间</Radio>
                 </RadioGroup>
               </div>
@@ -253,11 +253,16 @@ export default {
   },
   watch: {
     "form.getType": {
-      // handler(val) {
-      //   if (val == "FREE") {
-      //     this.rangeTimeType = 1;
-      //   }
-      // },
+      handler(val) {
+        if (val == "FREE") {
+          this.rangeTimeType = 1;
+        }else{
+          this.rangeTimeType = 0;
+        }
+        if(this.rangeTimeType == 0){
+          delete this.formRule.rangeTime
+        }
+      },
       deep: true,
     },
     $route(e) {
@@ -367,7 +372,7 @@ export default {
           key: "price",
           minWidth: 40,
           render: (h, params) => {
-            return h("div", this.$options.filters.unitPrice(params.row.price, "￥"));
+            return h("priceColorScheme", {props:{value:params.row.price,color:this.$mainColor}} );
           },
         },
         {
@@ -580,10 +585,11 @@ export default {
         onOk: () => {
           let ids = [];
           this.selectedGoods.forEach(function (e) {
-            ids.push(e.id);
+            ids.push(e.skuId);
           });
+
           this.form.promotionGoodsList = this.form.promotionGoodsList.filter((item) => {
-            return !ids.includes(item.id);
+            return !ids.includes(item.skuId);
           });
         },
       });

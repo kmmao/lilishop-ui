@@ -17,7 +17,26 @@ export let homeData = {};
  * notImg: true 没有选择图片功能
  * close:true 右侧关闭按钮
  */
+
 export const modelData = [
+  {
+    type: "flexOne",
+    name: "图片",
+    notAdd: true,
+    onlyImg: true,
+    img: "md-image",
+    options: {
+      list: [
+        {
+          img: "https://i.loli.net/2020/12/05/8wSNWbnqujDh6HL.png",
+          url: "",
+          link: "",
+          size: "750*280",
+          model: "link"
+        }
+      ]
+    }
+  },
   {
     type: "carousel",
     name: "图片轮播",
@@ -434,21 +453,21 @@ export const modelData = [
       ]
     }
   },
-  {
-    type: "search",
-    name: "搜索",
-    img: "md-image",
-    notAdd: true,
-    notLink: true,
-    notImg: true,
-    options: {
-      list: [
-        {
-          title: "搜索"
-        }
-      ]
-    }
-  },
+  // {
+  //   type: "search",
+  //   name: "搜索",
+  //   img: "md-image",
+  //   notAdd: true,
+  //   notLink: true,
+  //   notImg: true,
+  //   options: {
+  //     list: [
+  //       {
+  //         title: "搜索"
+  //       }
+  //     ]
+  //   }
+  // },
   {
     type: "goods",
     name: "商品分类",
@@ -504,7 +523,7 @@ export const modelData = [
               type: "精选",
               ___index:0
             },
-            
+
           ]
         }
       ]

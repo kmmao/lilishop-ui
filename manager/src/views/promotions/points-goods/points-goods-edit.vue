@@ -15,7 +15,9 @@
               <div>{{ form.goodsSku.storeName }}</div>
             </FormItem>
             <FormItem label="商品价格">
-              <div>{{ form.goodsSku.price | unitPrice("￥") }}</div>
+              <div>
+                <priceColorScheme :value="form.goodsSku.price" :color="$mainColor"></priceColorScheme>
+              </div>
             </FormItem>
             <FormItem label="库存">
               <div>{{ form.goodsSku.quantity }}</div>
@@ -33,11 +35,7 @@
               <Select
                 v-model="form.pointsGoodsCategoryId"
                 :label-in-value="true"
-                @on-change="
-                  (val) => {
-                    changeCategory(val, index);
-                  }
-                "
+                @on-change="changeCategory"
               >
                 <Option v-for="item in categoryList" :value="item.id" :key="item.id">{{
                   item.name
@@ -97,7 +95,10 @@ export default {
   name: "editPointsGoods",
   data() {
     return {
+      pointsGoodsCategoryId:'',
+      pointsGoodsCategoryName:'',
       form: {
+
         /** 活动名称 */
         promotionName: "",
         /** 报名截止时间 */
@@ -110,6 +111,7 @@ export default {
         seckillRule: "",
         goodsSku: {},
         promotionStatus: "NEW",
+
       },
       categoryList: [], // 分类列表
       id: this.$route.query.id, // 活动id
@@ -118,6 +120,7 @@ export default {
         settlementPrice: [{ required: true, message: "请填写结算价格" }],
         pointsGoodsCategoryId: [{ required: true, message: "请选择积分商品分类" }],
         points: [{ required: true, message: "请填写兑换积分" }],
+        activeStock: [{ required: true, message: "请填写库存" }],
       },
       options: {
         disabledDate(date) {
@@ -134,6 +137,12 @@ export default {
     }
   },
   methods: {
+    // 分类
+    changeCategory(v){
+      console.log(v);
+      this.pointsGoodsCategoryId=v.value
+      this.pointsGoodsCategoryName=v.label
+    },
     // 关闭当前页面
     closeCurrentPage() {
       this.$store.commit("removeTag", "edit-points-goods");
@@ -167,7 +176,12 @@ export default {
           this.form.startTime = start;
           this.form.endTime = end;
           this.submitLoading = true;
-          updatePointsGoods(this.form).then((res) => {
+          let params={
+            ...this.form,
+            pointsGoodsCategoryId: this.pointsGoodsCategoryId,
+            pointsGoodsCategoryName:this.pointsGoodsCategoryName
+          }
+          updatePointsGoods(params).then((res) => {
             this.submitLoading = false;
             if (res.success) {
               this.$Message.success("积分商品修改成功");

@@ -77,13 +77,13 @@
               @click="manage(row, 'view')"
               >查看</Button
             >
-            <Button
-              type="error"
-              size="small"
-              v-if="row.promotionStatus != 'START'"
-              @click="remove(row)"
-              >删除</Button
-            >
+            <!--<Button-->
+              <!--type="error"-->
+              <!--size="small"-->
+              <!--v-if="row.promotionStatus != 'START'"-->
+              <!--@click="remove(row)"-->
+              <!--&gt;删除</Button-->
+            <!--&gt;-->
             <Button
               type="success"
               v-if="row.promotionStatus == 'CLOSE'"
@@ -205,10 +205,15 @@ export default {
     },
     // 重置
     handleReset() {
-      this.searchForm = {};
+      this.searchForm = {
+        // 搜索框初始化对象
+        pageNumber: 0, // 当前页数
+        pageSize: 10, // 页面大小
+        sort: "startTime",
+        order: "desc", // 默认排序方式
+      };
       this.selectDate = "";
-      this.searchForm.pageNumber = 0;
-      this.searchForm.pageSize = 10;
+
       this.getDataList();
     },
     // 时间段分别赋值
@@ -246,7 +251,8 @@ export default {
     },
     // 管理拼团商品
     manage(v, status) {
-      this.$router.push({ name: "pintuan-goods", query: { id: v.id, status: status } });
+      this.$options.filters.customRouterPush({name: "pintuan-goods", query: { id: v.id, status: status }}  )
+
     },
     // 手动开启拼团活动
     open(v) {

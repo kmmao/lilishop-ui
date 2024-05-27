@@ -66,7 +66,9 @@
         </template>
 
         <template slot="commissionRate" slot-scope="scope">
-          {{ scope.row.commissionRate }}%
+          <priceColorScheme v-if="scope.row.commissionRate > 0" unit=""  :color="$mainColor" :value="scope.row.commissionRate">%</priceColorScheme>
+          <priceColorScheme v-else :value="scope.row.commissionRate" unit=""  >%</priceColorScheme>
+           <!-- {{ scope.row.commissionRate }}% -->
         </template>
 
         <template slot="deleteFlag" slot-scope="{ row }">
@@ -112,14 +114,14 @@
             <InputNumber v-model="formAdd.sortOrder"></InputNumber>
           </FormItem>
           <FormItem label="佣金比例(%)" prop="commissionRate" style="width: 345px">
-            <InputNumber v-model="formAdd.commissionRate"></InputNumber>
+            <InputNumber :max="100" :min="0" v-model="formAdd.commissionRate"></InputNumber>
           </FormItem>
           <FormItem label="是否启用" prop="deleteFlag">
             <i-switch
               size="large"
               v-model="formAdd.deleteFlag"
-              :true-value="0"
-              :false-value="1"
+              :true-value="false"
+              :false-value="true"
             >
               <span slot="open">启用</span>
               <span slot="close">禁用</span>
@@ -182,17 +184,17 @@
 </template>
 <script>
 import {
-  insertCategory,
-  updateCategory,
-  getBrandListData,
-  delCategory,
-  getCategoryBrandListData,
-  saveCategoryBrand,
-  getSpecificationList,
-  getCategorySpecListData,
-  disableCategory,
-  saveCategorySpec,
-  getCategoryTree,
+delCategory,
+disableCategory,
+getBrandListData,
+getCategoryBrandListData,
+getCategorySpecListData,
+getCategoryTree,
+getSpecificationList,
+insertCategory,
+saveCategoryBrand,
+saveCategorySpec,
+updateCategory,
 } from "@/api/goods";
 
 import uploadPicInput from "@/components/lili/upload-pic-input";
@@ -204,6 +206,7 @@ export default {
   },
   data() {
     return {
+      recordLevel:[], // 记录当前层级
       submitLoading: false, //加载状态
       categoryList: [], // 分类列表
       loading: false, // 加载状态
@@ -265,7 +268,6 @@ export default {
         },
       ],
       tableData: [], // 表格数据
-      categoryIndex: 0, // 分类id
       checkedCategoryChildren: "", //选中的分类子级
     };
   },
@@ -382,7 +384,7 @@ export default {
               this.submitLoading = false;
               if (res.success) {
                 this.$Message.success("添加成功");
-                this.getAllList(this.categoryIndex);
+                this.getAllList();
                 this.modalVisible = false;
                 this.$refs.form.resetFields();
               }
@@ -393,7 +395,7 @@ export default {
               this.submitLoading = false;
               if (res.success) {
                 this.$Message.success("修改成功");
-                this.getAllList(this.categoryIndex);
+                this.getAllList();
                 this.modalVisible = false;
                 this.$refs.form.resetFields();
               }
@@ -414,7 +416,7 @@ export default {
             this.$Modal.remove();
             if (res.success) {
               this.$Message.success("操作成功");
-              this.getAllList(0);
+              this.getAllList();
             }
           });
         },
@@ -423,6 +425,7 @@ export default {
 
     // 异步手动加载分类名称
     handleLoadData(item, callback) {
+      this.recordLevel[item.level] = item.id;
       if (item.level == 0) {
         let categoryList = JSON.parse(JSON.stringify(this.categoryList));
         categoryList.forEach((val) => {
@@ -434,14 +437,14 @@ export default {
             // 模拟加载
             setTimeout(() => {
               callback(val.children);
-            }, 1000);
+            }, 100);
           }
         });
       } else {
         this.deepCategoryChildren(item.id, this.categoryList);
         setTimeout(() => {
           callback(this.checkedCategoryChildren);
-        }, 1000);
+        }, 100);
       }
     },
 
@@ -460,18 +463,30 @@ export default {
       }
     },
     // 获取分类数据
-    getAllList(parent_id) {
+    getAllList() {
       this.loading = true;
-      getCategoryTree(parent_id).then((res) => {
+      getCategoryTree().then((res) => {
         this.loading = false;
         if (res.success) {
           localStorage.setItem("category", JSON.stringify(res.result));
           this.categoryList = JSON.parse(JSON.stringify(res.result));
           this.tableData = res.result.map((item) => {
-            if (item.children.length != 0) {
-              item.children = [];
-              item._loading = false;
-            }
+            if(this.recordLevel[0] && item.id === this.recordLevel[0]) {
+              item._showChildren = true
+              // 继续判断第二层
+              if(this.recordLevel[1] && item.children){
+                item.children.map((child)=>{
+                  if(this.recordLevel[1] && child.id === this.recordLevel[1]){
+                    child._showChildren = true
+                  }
+                })
+              }
+            }else{
+              if (item.children.length !== 0) {
+                item.children = [];
+                item._loading = false;
+              }
+           }
             return item;
           });
         }

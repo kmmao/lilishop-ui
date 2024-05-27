@@ -1,7 +1,7 @@
 <template>
   <div>
     <Card>
-      <Row @keydown.enter.native="handleSearch">
+      <Row @keydown.enter.native.prevent="handleSearch">
         <Form
           ref="searchForm"
           :model="searchForm"
@@ -68,10 +68,9 @@
 
 <script>
 import {
-  getDistributionListData,
-  retreatDistribution,
-  resumeDistribution,
-  auditDistribution,
+getDistributionListData,
+resumeDistribution,
+retreatDistribution
 } from "@/api/distribution";
 import { distributionStatusList } from "./dataJson.js";
 export default {
@@ -105,11 +104,9 @@ export default {
           width: 150,
           sortable: false,
           render: (h, params) => {
-            return h(
-              "div",
-              this.$options.filters.unitPrice(params.row.rebateTotal, "￥")
-            );
+            return h("priceColorScheme", {props:{value:params.row.rebateTotal,color:this.$mainColor}} );
           },
+
         },
         {
           title: "可用金额",
@@ -117,10 +114,7 @@ export default {
           width: 150,
           sortable: false,
           render: (h, params) => {
-            return h(
-              "div",
-              this.$options.filters.unitPrice(params.row.canRebate, "￥")
-            );
+            return h("priceColorScheme", {props:{value:params.row.canRebate,color:'green'}} );
           },
         },
         {
@@ -129,10 +123,7 @@ export default {
           width: 150,
           sortable: false,
           render: (h, params) => {
-            return h(
-              "div",
-              this.$options.filters.unitPrice(params.row.commissionFrozen, "￥")
-            );
+            return h("priceColorScheme", {props:{value:params.row.commissionFrozen,color:'#347dda'}} );
           },
         },
         {

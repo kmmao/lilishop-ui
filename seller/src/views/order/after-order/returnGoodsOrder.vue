@@ -143,11 +143,9 @@
             key: "applyRefundPrice",
             width: 130,
             render: (h, params) => {
-              return h(
-                "div",
-                this.$options.filters.unitPrice(params.row.applyRefundPrice, "￥")
-              );
+              return h("priceColorScheme", {props:{value:params.row.applyRefundPrice,color:this.$mainColor}} );
             },
+
           },
           {
             title: "会员名称",
@@ -243,10 +241,21 @@
       },
       // 重置
       handleReset() {
-        this.searchForm = {};
+        const defaultForm = {
+          // 搜索框初始化对象
+          pageNumber: 1, // 当前页数
+          pageSize: 10, // 页面大小
+          sort: "createTime", // 默认排序字段
+          order: "desc", // 默认排序方式
+          startDate: "", // 起始时间
+          endDate: "", // 终止时间
+          serviceType:"RETURN_GOODS",
+          orderSn:"",
+          memberName:"",
+          goodsName:""
+        }
+        this.searchForm = defaultForm;
         this.selectDate = ''
-        this.searchForm.pageNumber = 1;
-        this.searchForm.pageSize = 10;
         this.getDataList();
       },
       // 范围时间选择格式化
@@ -272,10 +281,10 @@
       // 退货订单详情
       detail(v) {
         let sn = v.sn;
-        this.$router.push({
+        this.$options.filters.customRouterPush({
           name: "return-goods-order-detail",
           query: { sn: sn },
-        });
+        })
 
       },
     },

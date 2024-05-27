@@ -15,9 +15,12 @@
       <model-form ref="modelForm" :data="modelForm"></model-form>
     </div>
     <!-- 操作按钮 -->
-    <div class="btn-bar">
+    <div class="btn-bar" :class="{'top':isHiddenBar}">
       <Button type="primary" :loading="submitLoading" @click="saveTemplate">保存模板</Button>
       <Button class="ml_10" @click="resetTemplate">还原模板</Button>
+      <Button class="ml_10" @click="witeLocalStore">将装修内容写入到本地</Button>
+
+      <Button class="ml_10" v-if="hasCache" @click="clearCache">清空本地装修缓存</Button>
     </div>
   </div>
 </template>
@@ -32,16 +35,60 @@ export default {
     ModelForm,
   },
   mounted() {
+    const setting = window.localStorage.getItem('admin-setting') ? JSON.parse(window.localStorage.getItem('admin-setting')) : {};
+    this.isHiddenBar = setting.isUseTabsRouter
+     // 先读缓存，如果缓存有值则读缓存。
+    const cache = this.getStore('managerPCPageCache')
+    this.hasCache = !!cache;
+      if(cache){
+        this.$Modal.confirm({
+        title: '提示',
+        content: '获取到本地有缓存数据，是否使用缓存数据？',
+        okText: '使用',
+        cancelText: '取消',
+        onOk: () => {
+          let pageData = cache;
+          if (pageData) {
+            pageData = JSON.parse(pageData);
+            if (pageData.list[0].type === "topAdvert") {
+              // topAdvert 为顶部广告 navList为导航栏
+              this.$refs.modelForm.topAdvert = pageData.list[0];
+              this.$refs.modelForm.navList = pageData.list[1];
+              pageData.list.splice(0, 2);
+              this.modelForm = pageData;
+            } else {
+              this.modelForm = { list: [] };
+            }
+          } else {
+            this.modelForm = { list: [] };
+          }
+        }
+      });
+    }
     this.getTemplateItem(this.$route.query.id);
   },
   data() {
     return {
+      hasCache:false,
       modelData, // 可选模块数据
       modelForm: { list: [] }, // 模板数据
       submitLoading: false, // 提交加载状态
+      isHiddenBar:true,
     };
   },
   methods: {
+    clearCache(){
+      this.setStore('managerPCPageCache', '')
+      this.$Message.success('清除成功')
+    },
+      // 将楼层装修的内容写入到本地缓存中
+    witeLocalStore(){
+      const data ={...this.modelForm}
+      data.list.unshift(this.$refs.modelForm.navList);
+      data.list.unshift(this.$refs.modelForm.topAdvert);
+      this.setStore('managerPCPageCache', data)
+      this.$Message.success('写入成功')
+    },
     saveTemplate() {
       // 保存模板
       this.submitTemplate(this.$route.query.pageShow ? 'OPEN' : 'CLOSE')
@@ -49,13 +96,14 @@ export default {
     // 提交模板
     submitTemplate(pageShow) {
       this.submitLoading = true
-      const modelForm = JSON.parse(JSON.stringify(this.modelForm)) 
+      const modelForm = JSON.parse(JSON.stringify(this.modelForm))
       modelForm.list.unshift(this.$refs.modelForm.navList);
       modelForm.list.unshift(this.$refs.modelForm.topAdvert);
       const data = {
         id: this.$route.query.id,
         pageData: JSON.stringify(modelForm),
-        pageShow
+        // 如果是专题页面永远关闭
+        pageShow: this.$route.query.pageType === 'SPECIAL' ? 'CLOSE' : pageShow,
       };
       API_floor.updateHome(this.$route.query.id, data).then((res) => {
         this.submitLoading = false
@@ -107,8 +155,9 @@ export default {
   display: flex;
 }
 .model-list {
-  width: 120px;
-  height: auto;
+  width: 130px;
+  height: 620px;
+  overflow-y: auto;
   padding: 10px;
   background: #fff;
   margin-top: 60px;
@@ -121,17 +170,21 @@ export default {
     line-height: 30px;
   }
   .model-item {
-    width: 100px;
+    width: 110px;
     height: 30px;
     background: #eee;
     margin-top: 10px;
     line-height: 30px;
     text-align: center;
     color: #999;
+    transition:0.15s;
+    border-radius: 4px;
     &:hover {
-      border: 1px dashed #409eff;
-      color: #409eff;
+
+      background: $theme_color;
       cursor: move;
+      color: #fff;
+
     }
   }
   .ghost::after {
@@ -170,6 +223,9 @@ export default {
   padding: 10px;
   box-shadow: 1px 1px 10px #999;
   z-index: 99;
+
+}
+.top{
   top: 100px;
 }
 </style>

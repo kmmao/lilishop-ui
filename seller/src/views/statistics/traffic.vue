@@ -1,10 +1,8 @@
 <template>
   <div>
-    <Affix :offset-top="100">
       <Card class="card fixed-bottom">
         <affixTime @selected="clickBreadcrumb" />
       </Card>
-    </Affix>
     <Card class="card">
       <div>
         <h4>流量概况</h4>
@@ -76,12 +74,12 @@ export default {
           value: "YESTERDAY",
         },
         {
-          title: "最近7天",
+          title: "过去7天",
           selected: true,
           value: "LAST_SEVEN",
         },
         {
-          title: "最近30天",
+          title: "过去30天",
           selected: false,
           value: "LAST_THIRTY",
         },
@@ -190,6 +188,7 @@ export default {
     },
     // 初始化
     init() {
+      this.orderChart ? this.orderChart.clear() : ''
       API_Member.getStatisticsList(this.params).then((res) => {
         if (res.result) {
           this.data = res.result;
@@ -217,6 +216,11 @@ export default {
 };
 </script>
 <style scoped lang="scss">
+.fixed-bottom{
+  position:sticky;
+  z-index: 999;
+  top: 0;
+}
 .table {
   margin-top: 10px;
 }

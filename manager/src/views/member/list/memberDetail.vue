@@ -124,7 +124,7 @@
                   <Option value="DELIVERED">已发货</Option>
                   <Option value="COMPLETED">已完成</Option>
                   <Option value="TAKE">待核验</Option>
-                  <Option value="CANCELLED">已取消</Option>
+                  <Option value="CANCELLED">已关闭</Option>
                 </Select>
               </Form-item>
               <Form-item label="支付状态" prop="payStatus">
@@ -229,7 +229,10 @@
               </div>
 
               <div class="points-top-text">
-                {{memberWalletInfo.memberWallet?memberWalletInfo.memberWallet:0 | unitPrice('￥')}}
+
+                <priceColorScheme :value="memberWalletInfo.memberWallet" :color="$mainColor" :customer="{'fontSize':'21px'}" >
+                </priceColorScheme>
+
               </div>
             </div>
             <div style="min-width: 120px;">
@@ -237,8 +240,9 @@
                 冻结余额
               </div>
               <div class="points-top-text">
-                {{memberWalletInfo.memberFrozenWallet?memberWalletInfo.memberFrozenWallet:0 | unitPrice('￥')}}
-              </div>
+                <priceColorScheme :value="memberWalletInfo.memberFrozenWallet" :color="$mainColor" :customer="{'fontSize':'21px'}" >
+                </priceColorScheme>
+               </div>
             </div>
           </div>
           <Table
@@ -327,8 +331,8 @@
           <Input v-model="addressForm.mobile" clearable style="width: 80%" maxlength="11"/>
         </FormItem>
         <FormItem label="收货人地址" prop="consigneeAddressPath">
-          <Input v-model="addressForm.consigneeAddressPath" @on-focus="$refs.liliMap.showMap = true" clearable
-                 style="width: 80%"/>
+          <span>{{ addressForm.consigneeAddressPath || '暂无地址' }}</span>
+          <Button @click="$refs.map.open()" style="margin-left: 10px;">选择</Button>
         </FormItem>
         <FormItem label="详细地址" prop="detail">
           <Input v-model="addressForm.detail" maxlength="35" clearable style="width: 80%"/>
@@ -338,8 +342,8 @@
         </FormItem>
         <FormItem label="默认" prop="isDefault">
           <RadioGroup type="button" button-style="solid" v-model="addressForm.isDefault">
-            <Radio label="1">是</Radio>
-            <Radio label="0">否</Radio>
+            <Radio :label="1">是</Radio>
+            <Radio :label="0">否</Radio>
           </RadioGroup>
         </FormItem>
       </Form>
@@ -348,24 +352,23 @@
         <Button type="primary" :loading="submitLoading" @click="addressSubmit">保存</Button>
       </div>
     </Modal>
-    <liliMap ref="liliMap" @getAddress="getAddress"></liliMap>
+    <multipleMap ref="map" @callback="getAddress"></multipleMap>
   </div>
 </template>
 
 <script>
-  import region from "@/components/region";
+
   import * as API_Member from "@/api/member.js";
   import ossManage from "@/views/sys/oss-manage/ossManage";
-  import liliMap from "@/components/map/index";
+  import multipleMap from "@/components/map/multiple-map";
   import * as RegExp from '@/libs/RegExp.js';
   import * as API_Order from "@/api/order.js";
 
   export default {
     name: "memberDetail",
     components: {
-      region,
       ossManage,
-      liliMap
+      multipleMap
     },
     data() {
       return {
@@ -377,7 +380,9 @@
         addressModalVisible: false, //会员地址操作弹出框
         addressForm: {
           id: "",
-          isDefault: "0"
+          isDefault: 0,
+          consigneeAddressPath:"",
+          consigneeAddressIdPath:""
 
         },//会员地址操作form
         selectDate: null, // 选择时间段
@@ -419,21 +424,9 @@
             width: 150,
             render: (h, params) => {
               if (params.row.pointType == 'INCREASE') {
-                return h('div', [
-                  h('span', {
-                    style: {
-                      color: 'green'
-                    }
-                  }, "+" + params.row.variablePoint),
-                ]);
+                return h("priceColorScheme", {props:{value:params.row.variablePoint,color:'green',unit:"+"}} );
               } else {
-                return h('div', [
-                  h('span', {
-                    style: {
-                      color: 'red'
-                    }
-                  }, '-' + params.row.variablePoint),
-                ]);
+                return h("priceColorScheme", {props:{value:params.row.variablePoint,color:this.$mainColor,unit:"-"}} );
               }
             }
           },
@@ -463,8 +456,8 @@
             key: "flowPrice",
             width: 130,
             render: (h, params) => {
-              return h("div", this.$options.filters.unitPrice(params.row.flowPrice, '￥'));
-            }
+              return h("priceColorScheme", {props:{value:params.row.flowPrice,color:this.$mainColor}} );
+            },
           },
           {
             title: "订单类型",
@@ -518,7 +511,7 @@
               } else if (params.row.orderStatus == "TAKE") {
                 return h('div', [h('span', {}, '待核验'),]);
               } else if (params.row.orderStatus == "CANCELLED") {
-                return h('div', [h('span', {}, '已取消'),]);
+                return h('div', [h('span', {}, '已关闭'),]);
               }
             }
           },
@@ -664,7 +657,7 @@
             key: "isDefault",
             width: 80,
             render: (h, params) => {
-              if (params.row.isDefault == "1") {
+              if (params.row.isDefault) {
                 return h('div', [
                   h('span', {}, "是"),
                 ]);
@@ -768,21 +761,9 @@
             width: 150,
             render: (h, params) => {
               if (params.row.money >0) {
-                return h('div', [
-                  h('span', {
-                    style:{
-                      color: 'green'
-                    }
-                  }, this.$options.filters.unitPrice(params.row.money,'￥')),
-                ]);
+                return h("priceColorScheme", {props:{value:params.row.money,color:'green'}} );
               } else if (params.row.money < 0) {
-                return h('div', [
-                  h('span', {
-                    style:{
-                      color: 'red'
-                    }
-                  }, this.$options.filters.unitPrice(params.row.money,'￥')),
-                ]);
+                return h("priceColorScheme", {props:{value:params.row.money,color:this.$mainColor}} );
               }
             },
           },
@@ -839,11 +820,10 @@
             width: 130,
             render: (h, params) => {
               if(params.row.receiptPrice == null){
-                return h("div", this.$options.filters.unitPrice(0, '￥'));
+                return h("priceColorScheme", {props:{value:0,color:this.$mainColor}} );
               }else{
-                return h("div", this.$options.filters.unitPrice(params.row.receiptPrice, '￥'));
+                return h("priceColorScheme", {props:{value:params.row.receiptPrice,color:this.$mainColor}} );
               }
-
             }
           },
           {
@@ -980,14 +960,16 @@
         this.addressModalVisible = true
         this.addressForm = {
           id: "",
-          isDefault: "0",
+          isDefault: 0,
         }
 
       },
       //修改TA的收货地址
       editAddress(v) {
         this.addressModalTitle = "修改会员地址";
-        this.$set(this, "addressForm", v);
+        this.addressForm = JSON.parse(JSON.stringify(v));
+        this.addressForm.isDefault = v.isDefault?1:0;
+        // this.$set(this, "addressForm", v);
         delete this.addressForm.updateTime;
         this.addressModalVisible = true
       },
@@ -998,7 +980,7 @@
           if (valid) {
             this.submitLoading = true;
             let submit = JSON.parse(JSON.stringify(this.addressForm))
-            submit.isDefault == "1" ? submit.isDefault  = true :  submit.isDefault = false
+            submit.isDefault ? submit.isDefault  = true :  submit.isDefault = false
             if (submit.id != "") {
               //修改地址
               API_Member.editMemberAddress(submit).then((res) => {
@@ -1025,12 +1007,24 @@
 
       },
       //获取地址
-      getAddress(item) {
-        this.$set(this.addressForm, 'consigneeAddressPath', item.addr)
-        this.$set(this.addressForm, 'consigneeAddressIdPath', item.addrId)
-        this.addressForm.address = item.address
-        this.addressForm.lat = item.position.lat
-        this.addressForm.lon = item.position.lng
+      getAddress(val) {
+        if (val.type === 'select') {
+          const paths = val.data.map(item => item.name).join(',')
+          const ids = val.data.map(item => item.id).join(',')
+
+          this.$set(this.addressForm,'consigneeAddressPath',paths)
+          this.$set(this.addressForm,'consigneeAddressIdPath',ids)
+
+          // 解析center 转为经纬度
+          const coord = val.data[val.data.length - 1].center.split(',')
+          this.addressForm.lat = coord[1]
+          this.addressForm.lon = coord[0]
+        }else{
+          this.$set(this.addressForm,'consigneeAddressPath', val.data.addr)
+          this.$set(this.addressForm,'consigneeAddressIdPath',val.data.addrId)
+          this.addressForm.lat = val.data.position.lat
+          this.addressForm.lon = val.data.position.lng
+        }
       },
       //删除会员地址
       memberAddressRemove(v) {

@@ -115,7 +115,7 @@ export default {
           key: "price",
           minWidth: 130,
           render: (h, params) => {
-            return h("div", this.$options.filters.unitPrice(params.row.price, "￥"));
+            return h("priceColorScheme", {props:{value:params.row.price,color:this.$mainColor}} );
           },
         },
         {
@@ -208,6 +208,7 @@ export default {
                 "Button",
                 {
                   props: {
+                    type: 'default',
                     size: "small",
                   },
                   on: {
@@ -286,10 +287,10 @@ export default {
     //查看商品详情
     showDetail(v) {
       let id = v.id;
-      this.$router.push({
+      this.$options.filters.customRouterPush({
         name: "goods-detail",
         query: { id: id },
-      });
+      })
     },
   },
   mounted() {

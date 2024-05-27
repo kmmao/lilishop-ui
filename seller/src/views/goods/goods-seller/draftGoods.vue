@@ -84,11 +84,9 @@ export default {
         {
           title: "商品价格",
           key: "price",
+          width: 120,
           render: (h, params) => {
-            return h(
-              "div",
-              this.$options.filters.unitPrice(params.row.price, "￥")
-            );
+            return h("priceColorScheme", {props:{value:params.row.price || 0,color:this.$mainColor}} );
           },
         },
         {

@@ -22,12 +22,15 @@
         <span v-if="storeDisable == 'REFUSED'">审核未通过,请修改资质信息，如有疑问请联系管理员</span>
       </div>
       <Button v-if="currentIndex === 3" @click="$router.push('/')">返回</Button>
+      &nbsp;
       <Button type="primary" @click='currentIndex = 0'
         v-if="storeDisable === 'REFUSED' && currentIndex === 3">重新申请</Button>
     </div>
 
     <Modal title="店铺入驻协议" v-model="showAgreement" width="1200" :closable="false" :mask-closable="false">
-      <div class="agreeent-con" v-html="agreementCon"></div>
+      <Scroll :on-reach-bottom="handleReachBottom">
+        <div class="agreeent-con" v-html="agreementCon"></div>
+      </Scroll>
 
       <div slot="footer" style="text-align: center">
         <p>
@@ -39,6 +42,7 @@
   </div>
 </template>
 <script>
+
 import { agreement, applyStatus } from "@/api/shopentry";
 import firstApply from "./FirstApply";
 import secondApply from "./SecondApply";
@@ -68,6 +72,9 @@ export default {
       agreement().then((res) => {
         this.agreementCon = res.result.content;
       });
+    },
+    handleReachBottom(){
+
     },
     getData(status) {
       // 获取已填写店铺信息
@@ -146,8 +153,11 @@ export default {
     },
   },
   mounted() {
-    this.getData("init");
-    this.getArticle();
+
+      this.getData("init");
+      this.getArticle();
+
+
   },
 };
 </script>
@@ -162,7 +172,7 @@ export default {
   padding: 10px 20px;
 
   h1 {
-    
+
     margin-top: 20px;
   }
 }
@@ -172,6 +182,10 @@ export default {
 }
 .agreeent-con {
   max-height: 500px;
+  ::v-deep img{
+    max-width: 100%;
+
+  }
 }
 .success-page {
   height: 500px;

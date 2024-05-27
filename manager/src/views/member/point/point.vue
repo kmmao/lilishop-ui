@@ -8,6 +8,7 @@
         inline
         style="margin-top:10px"
         :label-width="70"
+        @submit.native.prevent
         class="search-form"
       >
         <Form-item label="会员名称" prop="username">
@@ -49,7 +50,7 @@
 </template>
 
 <script>
-  import region from "@/components/region";
+
   import * as API_Member from "@/api/member.js";
   import ossManage from "@/views/sys/oss-manage/ossManage";
 
@@ -57,7 +58,7 @@
     // 积分历史页面
     name: "point",
     components: {
-      region,
+
       ossManage,
     },
     data() {
@@ -93,23 +94,10 @@
             width: 110,
             render: (h, params) => {
               if (params.row.pointType == 'INCREASE') {
-                return h('div', [
-                  h('span', {
-                    style: {
-                      color: 'green'
-                    }
-                  }, "+" + params.row.variablePoint),
-                ]);
+                return h("priceColorScheme", {props:{value:params.row.variablePoint,color:'green',unit:"+"}} );
               } else {
-                return h('div', [
-                  h('span', {
-                    style: {
-                      color: 'red'
-                    }
-                  }, '-' + params.row.variablePoint),
-                ]);
+                return h("priceColorScheme", {props:{value:params.row.variablePoint,color:this.$mainColor,unit:"-"}} );
               }
-
             }
           },
           {

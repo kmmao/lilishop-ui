@@ -87,7 +87,17 @@
           <p class="item">
             <span class="label">店铺所在地：</span>
             <span class="info">
-              {{storeInfo.storeAddressPath || storeInfo.storeAddressDetail?storeInfo.storeAddressPath +storeInfo.storeAddressDetail:"暂未完善"}}
+              <span>
+                {{
+                (storeInfo.storeAddressPath!==null && storeInfo.storeAddressPath!=='' && storeInfo.storeAddressPath!=="null" && storeInfo.storeAddressPath!==undefined )? storeInfo.storeAddressPath: ""
+                }}
+              </span>
+              <span>
+                {{
+                (storeInfo.storeAddressDetail!==null && storeInfo.storeAddressDetail!=='' && storeInfo.storeAddressDetail!=="null" && storeInfo.storeAddressDetail!==undefined )? storeInfo.storeAddressDetail:""
+                }}
+              </span>
+              {{(storeInfo.storeAddressPath!==null && storeInfo.storeAddressPath!=='' && storeInfo.storeAddressPath!=="null" && storeInfo.storeAddressPath!==undefined) || (storeInfo.storeAddressDetail!==null && storeInfo.storeAddressDetail!=='' && storeInfo.storeAddressDetail!=="null" && storeInfo.storeAddressDetail!==undefined )?"":"暂未完善"}}
             </span>
           </p>
           <p class="item">
@@ -120,11 +130,11 @@
         <div class="ant-col-md-6">
           <p class="item">
             <span class="label">法人姓名：</span>
-            <span class="info">{{storeInfo.legalName}}人</span>
+            <span class="info">{{storeInfo.legalName}}</span>
           </p>
           <p class="item">
             <span class="label">法人身份证：</span>
-            <span class="info">{{storeInfo.legalId}}人</span>
+            <span class="info">{{storeInfo.legalId}}</span>
           </p>
           <p class="item">
             <span class="label">身份证照片：</span>
@@ -231,7 +241,7 @@
                   <Option value="DELIVERED">已发货</Option>
                   <Option value="COMPLETED">已完成</Option>
                   <Option value="TAKE">待核验</Option>
-                  <Option value="CANCELLED">已取消</Option>
+                  <Option value="CANCELLED">已关闭</Option>
                 </Select>
               </Form-item>
               <Form-item label="支付状态" prop="payStatus">
@@ -556,7 +566,7 @@
 </template>
 
 <script>
-  import region from "@/components/region";
+
   import ossManage from "@/views/sys/oss-manage/ossManage";
   import * as RegExp from '@/libs/RegExp.js';
   import {getCategoryTree} from "@/api/goods";
@@ -567,7 +577,7 @@
   export default {
     name: "member",
     components: {
-      region,
+
       ossManage,
     },
     data() {
@@ -592,8 +602,9 @@
             key: "flowPrice",
             width: 140,
             render: (h, params) => {
-              return h("div", this.$options.filters.unitPrice(params.row.flowPrice, '￥'));
-            }
+              return h("priceColorScheme", {props:{value:params.row.flowPrice,color:this.$mainColor}} );
+            },
+
           },
           {
             title: "订单类型",
@@ -649,7 +660,7 @@
               } else if (params.row.orderStatus == "TAKE") {
                 return h('div', [h('span', {}, '待核验'),]);
               } else if (params.row.orderStatus == "CANCELLED") {
-                return h('div', [h('span', {}, '已取消'),]);
+                return h('div', [h('span', {}, '已关闭'),]);
               }
             }
           },
@@ -762,19 +773,9 @@
             key: "applyRefundPrice",
             width: 110,
             render: (h, params) => {
-              if (params.row.applyRefundPrice == null) {
-                return h(
-                  "div",
-                  this.$options.filters.unitPrice(0, "￥")
-                );
-              } else {
-                return h(
-                  "div",
-                  this.$options.filters.unitPrice(params.row.applyRefundPrice, "￥")
-                );
-              }
-
+              return h("priceColorScheme", {props:{value:params.row.applyRefundPrice,color:this.$mainColor}} );
             },
+
           },
           {
             title: "售后类型",
@@ -871,7 +872,9 @@
           this.$set(this, "storeInfo", res.result);
           //因switch开关需要用到true或者false 所以进行一次格式化
           this.storeInfo.storeDisable = this.storeInfo.storeDisable === "OPEN" ? true : false
-          this.checkAllGroup = this.storeInfo.goodsManagementCategory.split(",");
+          if(this.storeInfo.goodsManagementCategory != null){
+            this.checkAllGroup = this.storeInfo.goodsManagementCategory.split(",");
+          }
           this.storeInfo.legalPhoto = this.storeInfo.legalPhoto.split(",");
         });
       },

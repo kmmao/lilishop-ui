@@ -18,7 +18,9 @@
         ref="table"
       >
         <template slot-scope="{ row }" slot="originalPrice">
-          <div>{{ row.originalPrice | unitPrice("￥") }}</div>
+          <div>
+            <priceColorScheme :value="row.originalPrice" :color="$mainColor"></priceColorScheme>
+          </div>
         </template>
 
         <template slot-scope="{ row }" slot="quantity">
@@ -26,7 +28,9 @@
         </template>
 
         <template slot-scope="{ row }" slot="price">
-          <div>{{ row.price | unitPrice("￥") }}</div>
+          <div>
+            <priceColorScheme :value="row.price" :color="$mainColor"></priceColorScheme>
+          </div>
         </template>
 
         <template slot-scope="{ row }" slot="time">
@@ -47,7 +51,7 @@
       </Table>
       <Row type="flex" justify="end" class="mt_10">
         <Page
-          :current="searchForm.pageNumber + 1"
+          :current="searchForm.pageNumber"
           :total="total"
           :page-size="searchForm.pageSize"
           @on-change="changePage"
@@ -80,7 +84,7 @@ export default {
       submitLoading: false, // 加载状态
       searchForm: {
         // 搜索框初始化对象
-        pageNumber: 0, // 当前页数
+        pageNumber: 1, // 当前页数
         pageSize: 10, // 页面大小
       },
       total: 0, // 总数

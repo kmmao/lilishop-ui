@@ -37,6 +37,11 @@ export const login = params => {
   return postRequestWithNoTokenData("/passport/login/userLogin", params);
 };
 
+// 手机登陆
+export const storeSmsLogin = params => {
+  return postRequestWithNoToken("/passport/login/smsLogin", params);
+};
+
 // 登出
 export const logout = () => {
   return postRequest("/passport/login/logout");
@@ -50,7 +55,10 @@ export const userInfo = params => {
 export const userMsg = params => {
   return getRequest('/settings/storeSettings', params)
 }
-
+//验证短信验证码
+export const validateCode = params => {
+  return postRequestWithNoToken("/passport/login/resetByMobile", params);
+};
 // 初始化验证码
 export const initCaptcha = params => {
   return getRequestWithNoToken("/common/captcha/init", params);
@@ -106,6 +114,10 @@ export const sendCodeEmail = (email, params) => {
 // 个人中心发送修改邮箱验证邮件
 export const editEmail = params => {
   return postRequest("/email/editEmail", params);
+};
+// 忘记密码并修改
+export const forgetAndModify = params => {
+  return postRequest("/passport/login/resetPassword", params);
 };
 // 个人中心修改密码
 export const changePass = params => {
@@ -289,6 +301,10 @@ export const editDepartment = (ids, params) => {
 export const loadDepartment = (id) => {
   return getRequest(`/department/${id}`);
 };
+// 搜索部门
+export const searchDepartment = (params) => {
+  return getRequest("/department", params);
+};
 
 // 通过部门获取全部角色数据
 export const getUserByDepartmentId = (id, params) => {
@@ -365,4 +381,30 @@ export const editOtherUser = (id, params) => {
   return putRequest(`/clerk/${id}`,params);
 };
 
+// /**
+//  *  搜索部门 先加入此api防止运行warn
+//  */
+// export const searchDepartment = (params) => {
+//   return getRequest("/permission/department/search", params);
+// };
 
+
+// 获取文件目录列表
+export const getFileDirectory = () => {
+  return getRequest(commonUrl+`/common/resource/fileDirectory`);
+};
+
+// 添加文件目录
+export const addFileDirectory = (params) => {
+  return postRequestWithNoForm(commonUrl+`/common/resource/fileDirectory`,params);
+};
+
+// 修改文件目录
+export const updateFileDirectory = (params) => {
+  return putRequestWithNoForm(commonUrl+`/common/resource/fileDirectory`,params);
+};
+
+// 删除文件目录
+export const delFileDirectory = (id) => {
+  return deleteRequest(commonUrl+`/common/resource/fileDirectory/${id}`);
+};

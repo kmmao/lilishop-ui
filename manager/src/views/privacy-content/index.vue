@@ -3,6 +3,7 @@
     <Row>
       <Col span="24">
       <Card class="article-detail">
+        <Alert>隐私协议在移动端中 设置->关于我们->对应的文章展示</Alert>
         <Table :loading="loading" border :columns="columns" :data="data" ref="table">
         </Table>
       </Card>
@@ -10,20 +11,33 @@
     </Row>
     <template v-if="!selected">
       <Modal :title="modalTitle" v-model="modalVisible" :mask-closable="false" :width="1100">
-        <Form ref="form" :model="form.article" :label-width="100">
-          <FormItem label="文章标题" prop="title">
-            <Input v-model="form.article.title" clearable style="width: 40%" />
-          </FormItem>
-          <FormItem class="form-item-view-el" label="文章内容" prop="content">
+        <Row>
+          <Col span="16">
+            <Form ref="form" :model="form.article" :label-width="100">
+              <FormItem label="文章标题" prop="title">
+                <Input v-model="form.article.title" clearable style="width: 40%" />
+              </FormItem>
+              <FormItem class="form-item-view-el" label="文章内容" prop="content">
 
-          <editor
-              ref="editor"
-              openXss
-               v-model="form.article.content"
-              :init="{ ...initEditor,height:'800px' }"
-            ></editor>
-          </FormItem>
-        </Form>
+                <editor
+                  ref="editor"
+                  openXss
+                  v-model="form.article.content"
+                  v-if="modalVisible"
+                ></editor>
+              </FormItem>
+            </Form>
+          </Col>
+          <Col span="8">
+            <div class="mobile-effect">
+              <div class="title">页面预览</div>
+              <div class="content">
+                <div v-html="form.article.content"></div>
+              </div>
+            </div>
+          </Col>
+        </Row>
+
         <div slot="footer">
           <Button type="text" @click="modalVisible = false">取消</Button>
           <Button type="primary" :loading="submitLoading" @click="handleSubmit">提交</Button>
@@ -39,12 +53,12 @@ import {
   updatePrivacy,
   getPrivacy,
 } from "@/api/pages";
-import Editor from "@tinymce/tinymce-vue";
-import { initEditor } from "@/components/editor/config";
+import tinymec from "@/components/editor/index.vue";
+
 export default {
   name: "privacy",
  components: {
-    editor: Editor,
+    editor: tinymec,
   },
   props: {
     selected: {
@@ -54,7 +68,6 @@ export default {
   },
   data() {
     return {
-      initEditor,
       loading: false, // 表单加载状态
       modalVisible: false, // 添加或编辑显示
       treeDataDefault: [],
@@ -245,3 +258,29 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+  .mobile-effect {
+    box-sizing: border-box;
+    margin: 0 20px;
+    border: 2px solid #f1f2f3;
+    height: 610px;
+    .title {
+      align-items: center;
+      background: #f9f9fa;
+      border-radius: 4px 4px 0 0;
+      color: #85878a;
+      display: flex;
+      font-size: 12px;
+      height: 32px;
+      line-height: 20px;
+      padding: 0 12px;
+    }
+    .content {
+      width: 100%;
+      height: 560px;
+      padding: 0 14px;
+      overflow-y: scroll;
+    }
+  }
+</style>

@@ -18,6 +18,15 @@
             <FormItem label="商品卖点">
               {{ goods.sellingPoint }}
             </FormItem>
+            <FormItem label="商品参数">
+             <div v-if="goods.goodsParamsDTOList && goods.goodsParamsDTOList.length" v-for="(item,index) in goods.goodsParamsDTOList" :key="index">
+               <div style="margin-bottom: 10px; display: flex; align-items: center;" >
+                  {{ item.groupName }} : <tag v-for="(child,i) in item.goodsParamsItemDTOList" :key="i">
+                  {{ child.paramName }} - {{ child.paramValue }}
+                  </tag>
+               </div>
+             </div>
+            </FormItem>
           </div>
           <h4>商品交易信息</h4>
           <div class="form-item-view">
@@ -38,7 +47,8 @@
           <div class="form-item-view">
             <FormItem label="商品编号"> {{ goods.id }}</FormItem>
             <FormItem label="商品价格">
-              ¥{{ goods.price | unitPrice }}
+              <priceColorScheme :value="goods.price" :color="$mainColor"></priceColorScheme>
+
             </FormItem>
             <FormItem label="商品图片">
               <div
@@ -62,14 +72,24 @@
                 </Modal>
               </div>
             </FormItem>
+            <FormItem label="商品视频">
+              <video
+                v-if="goods.goodsVideo"
+                controls
+                class="player"
+                :src="goods.goodsVideo"
+              />
+            </FormItem>
             <FormItem label="商品规格">
               <Table :columns="skuColumn" :data="skuData">
                 <template slot="showImage" slot-scope="scope">
-                  <div style="margin-top: 5px; height: 80px; display: flex">
+                  <div style="margin-top: 5px; display: flex">
                     <div>
                       <img
-                        :src="scope.row.image"
-                        style="height: 60px; margin-top: 1px; width: 60px"
+                        v-for="(item,index) in scope.row.image"
+                        :key="index"
+                        :src="item"
+                        style="height: 60px; margin:10px; width: 60px"
                       />
                     </div>
                   </div>
@@ -179,9 +199,10 @@ export default {
             specs: sku.simpleSpecs,
             sn: sku.sn,
             weight: sku.weight,
-            cost: that.$options.filters.unitPrice(sku.cost, "¥"),
-            price: that.$options.filters.unitPrice(sku.price, "¥"),
-            image: sku.thumbnail,
+            cost: sku.cost,
+            price:sku.price,
+            image: sku.goodsGalleryList,
+            quantity:sku.quantity
           });
         });
         if (res.result.salesModel === "WHOLESALE" && res.result.wholesaleList) {
@@ -193,13 +214,23 @@ export default {
           });
         } else {
           this.skuColumn.push(
-            {
-              title: "成本",
-              key: "cost",
-            },
+            // {
+            //   title: "成本",
+            //   key: "cost",
+            //   render: (h, params) => {
+            //     console.log(params)
+            //     return h("priceColorScheme", {props:{value:params.row.cost,color:this.$mainColor}} );
+            //   },
+            // },
             {
               title: "价格",
               key: "price",
+              render: (h, params) => {
+                return h("priceColorScheme", {props:{value:params.row.price,color:this.$mainColor}} );
+              },
+            },{
+              title: "库存",
+              key: "quantity",
             }
           );
         }

@@ -106,11 +106,9 @@
             key: "billPrice",
             minWidth: 100,
             render: (h, params) => {
-              return h(
-                "div",
-                this.$options.filters.unitPrice(params.row.billPrice, "￥")
-              );
+              return h("priceColorScheme", {props:{value:params.row.billPrice,color:this.$mainColor}} );
             },
+
           },
 
 
@@ -209,11 +207,10 @@
       // 跳转结算详情
       detail(v) {
         let id = v.id;
-        this.$router.push({
+        this.$options.filters.customRouterPush({
           name: "bill-detail",
           query: { id: id },
-        });
-
+        })
       },
     },
     mounted () {

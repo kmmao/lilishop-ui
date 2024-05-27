@@ -126,13 +126,10 @@
             minWidth:80,
             sortable: false,
             render: (h, params) => {
-              if(params.row.rebate == null){
-                return h("div", this.$options.filters.unitPrice(0, '￥'));
-              }else{
-                return h("div", this.$options.filters.unitPrice(params.row.rebate, '￥'));
-              }
+              return h("priceColorScheme", {props:{value:params.row.rebate,color:this.$mainColor}} );
+            },
 
-            }
+
           },
           {
             fixed: "right",
@@ -212,6 +209,7 @@
       filterStatus (status) { // 过滤订单状态
         const arr = [
           {status: 'WAIT_BILL', title: '待结算'},
+          {status: 'NO_COMPLETED', title: '未完成'},
           {status: 'WAIT_CASH', title: '待提现'},
           {status: 'COMPLETE_CASH', title: '提现完成'},
           {status: 'CANCEL', title: '订单取消'},
@@ -229,6 +227,7 @@
           {status: 'WAIT_CASH', color: 'orange'},
           {status: 'COMPLETE_CASH', color: 'green'},
           {status: 'CANCEL', color: 'red'},
+          {status: 'NO_COMPLETED', color: 'red'},
           {status: 'REFUND', color: 'magenta'},
         ]
         for (let i=0;i<arr.length;i++) {

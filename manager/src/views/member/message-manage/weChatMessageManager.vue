@@ -28,20 +28,18 @@
 
       </div>
       <div slot="footer" style="text-align: right">
-        <Button v-if="tab === 'WECHAT'" type="success" size="large" @click="wechatFormDataEdit">保存</Button>
+        <Button v-if="tab === 'WECHAT'"  type="primary"  @click="wechatFormDataEdit">保存</Button>
 
-        <Button v-else type="success" size="large" @click="wechatMPFormDataEdit">保存</Button>
+        <Button v-else  type="primary" @click="wechatMPFormDataEdit">保存</Button>
       </div>
     </Modal>
 
-
+  <Card>
     <Tabs @on-click="tabPaneChange" v-model="tab">
       <TabPane label="微信消息" name="WECHAT">
         <div class="search">
-          <Card>
-
             <Row class="operation mt_10">
-              <Button @click="weChatSync" type="primary">同步微信消息</Button>
+              <Button @click="weChatSync" type="primary">初始化微信消息</Button>
             </Row>
             <Table
               :loading="loading"
@@ -61,16 +59,13 @@
                 size="small"
               ></Page>
             </Row>
-          </Card>
         </div>
       </TabPane>
 
       <TabPane label="微信小程序订阅消息" name="WECHATMP">
         <div class="search">
-          <Card>
-
             <Row class="operation mt_10">
-              <Button @click="weChatSync('mp')" type="primary">同步微信小程序订阅消息</Button>
+              <Button @click="weChatSync('mp')" type="primary">初始化微信小程序订阅消息</Button>
             </Row>
             <Table
               :loading="loading"
@@ -91,10 +86,10 @@
                 size="small"
               ></Page>
             </Row>
-          </Card>
         </div>
       </TabPane>
     </Tabs>
+     </Card>
   </div>
 
 
@@ -281,6 +276,9 @@ export default {
     wechatFormDataEdit() {
       this.$refs['wechatFormData'].validate((valid) => {
         if (valid) {
+          if(!this.wechatFormData.updateTime){
+            this.wechatFormData.updateTime = ''
+          }
           editWechatMessageTemplate(this.id, this.wechatFormData).then(res => {
             if (res.message === 'success') {
               this.$Message.success('微信模板修改成功');

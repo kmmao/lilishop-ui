@@ -124,7 +124,7 @@
           <div class="today-list flex">
             <div class="today-item">
               <div>今日订单数</div>
-              <span>{{ homeData.todayOrderNum }}</span>
+              <span>{{ homeData.todayOrderNum || 0 }}</span>
             </div>
             <div class="today-item">
               <div>今日交易额</div>
@@ -200,12 +200,10 @@ import { homeStatistics, hotGoods, hotShops, getNoticePage } from "@/api/index";
 import * as API_Goods from "@/api/goods";
 import { Chart } from "@antv/g2";
 import * as API_Member from "@/api/member";
-// import i18nBox from '@/components/i18n-translate'
+
 export default {
   name: "home",
-  // components:{
-  //   i18nBox
-  // },
+
   data() {
     return {
       // 测试数据
@@ -230,11 +228,9 @@ export default {
         {
           title: "价格",
           key: "price",
+
           render: (h, params) => {
-            return h(
-              "div",
-              this.$options.filters.unitPrice(params.row.price, "￥")
-            );
+            return h("priceColorScheme", {props:{value:params.row.price,color:this.$mainColor}} );
           },
         },
         {
@@ -261,10 +257,7 @@ export default {
           title: "价格",
           key: "price",
           render: (h, params) => {
-            return h(
-              "div",
-              this.$options.filters.unitPrice(params.row.price, "￥")
-            );
+            return h("priceColorScheme", {props:{value:params.row.price,color:this.$mainColor}} );
           },
         },
         {
@@ -337,6 +330,7 @@ export default {
 
     // 实例化订单图表
     async initOrderChartList(name) {
+      this.orderChart ? this.orderChart.clear() : ''
       const res = await API_Goods.getOrderChart(this.orderParams);
       if (res.success) {
         this.chartList = res.result;
@@ -446,6 +440,7 @@ export default {
 
     // 浏览量
     async getPvChart() {
+      this.pvChart ? this.pvChart.clear() : ''
       API_Member.getStatisticsList(this.params).then((res) => {
         if (res.result) {
           this.data = res.result;
@@ -464,6 +459,7 @@ export default {
     },
     // 实例化会员流量图表
     async initHistoryMemberChartList() {
+      this.historyMemberChart ? this.historyMemberChart.clear() : ''
       const res = await API_Member.historyMemberChartList();
       if (res.success) {
         this.chartList = res.result;

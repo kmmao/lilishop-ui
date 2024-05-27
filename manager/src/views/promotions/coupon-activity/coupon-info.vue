@@ -12,11 +12,19 @@
               <span v-if="couponActivity.couponActivityType === 'REGISTERED'"
                 >新人发券</span
               >
+              <span v-else-if="couponActivity.couponActivityType === 'AUTO_COUPON'">自动发券</span>
               <spin v-else>精确发券</spin>
+            </FormItem>
+            <FormItem label="领取频率" v-if="couponActivity.couponFrequencyEnum != '' && couponActivity.couponFrequencyEnum != null && couponActivity.couponFrequencyEnum != undefined">
+              <span v-if="couponActivity.couponFrequencyEnum === 'DAY'"
+                >每日</span
+              >
+              <span v-else-if="couponActivity.couponFrequencyEnum === 'WEEK'">每周一次</span>
+              <span v-else>每月一次</span>
             </FormItem>
             <FormItem
               label="活动范围"
-              v-if="couponActivity.couponActivityType === 'SPECIFY'"
+              v-if="couponActivity.couponActivityType === 'SPECIFY' || couponActivity.couponActivityType === 'AUTO_COUPON'"
             >
               <span v-if="couponActivity.activityScope === 'ALL'">全部会员</span>
               <spin v-else>指定会员</spin>
@@ -68,10 +76,16 @@ export default {
             let text = "未知";
             if (params.row.couponType === "DISCOUNT") {
               text = params.row.couponDiscount + "折";
+              return h("div", [text]);
             } else if (params.row.couponType === "PRICE") {
-              text = "¥" + params.row.price;
+              return h("priceColorScheme", {props:{value:params.row.price,color:this.$mainColor}} );
+
+            }else{
+              return h("div", [text]);
             }
-            return h("div", [text]);
+
+
+
           },
         },
         {

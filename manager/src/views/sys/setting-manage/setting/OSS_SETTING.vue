@@ -2,49 +2,77 @@
   <div class="layout">
     <Form ref="formValidate" :label-width="150" label-position="right" :model="formValidate" :rules="ruleValidate">
 
-      <FormItem label="endPoint" prop="endPoint">
+      <FormItem label="平台" >
         <RadioGroup v-model="formValidate.type" type="button">
           <Radio label="ALI_OSS">阿里OSS</Radio>
           <Radio label="MINIO">MINIO</Radio>
+          <Radio label="HUAWEI_OBS">华为云OBS</Radio>
+          <Radio label="TENCENT_COS">腾讯云COS</Radio>
         </RadioGroup>
       </FormItem>
       <!--      阿里云存储-->
-      <FormItem v-if="formValidate.type==='ALI_OSS'" label="endPoint" prop="endPoint">
-        <Input v-model="formValidate.endPoint"/>
+      <FormItem v-if="formValidate.type==='ALI_OSS'" key="aliyunOSSEndPoint" label="节点" prop="aliyunOSSEndPoint">
+        <Input v-model="formValidate.aliyunOSSEndPoint"/>
       </FormItem>
-      <FormItem v-if="formValidate.type==='ALI_OSS'" label="bucketName" class="label-item" prop="bucketName">
-        <Input v-model="formValidate.bucketName"/>
+      <FormItem v-if="formValidate.type==='ALI_OSS'" key="aliyunOSSBucketName" label="储存空间" class="label-item" prop="aliyunOSSBucketName">
+        <Input v-model="formValidate.aliyunOSSBucketName"/>
       </FormItem>
-      <FormItem v-if="formValidate.type==='ALI_OSS'" label="picLocation" prop="bucketName">
-        <Input v-model="formValidate.picLocation"/>
+      <FormItem v-if="formValidate.type==='ALI_OSS'" key="aliyunOSSAccessKeyId" label="密钥id" prop="aliyunOSSAccessKeyId">
+        <Input v-model="formValidate.aliyunOSSAccessKeyId"/>
       </FormItem>
-      <FormItem v-if="formValidate.type==='ALI_OSS'" label="accessKeyId" prop="accessKeyId">
-        <Input v-model="formValidate.accessKeyId"/>
-      </FormItem>
-      <FormItem v-if="formValidate.type==='ALI_OSS'" label="accessKeySecret" prop="accessKeySecret">
-        <Input v-model="formValidate.accessKeySecret"/>
+      <FormItem v-if="formValidate.type==='ALI_OSS'" key="aliyunOSSAccessKeySecret" label="密钥" prop="aliyunOSSAccessKeySecret">
+        <Input v-model="formValidate.aliyunOSSAccessKeySecret"/>
       </FormItem>
 
 
       <!--      MINIO存储-->
 
-      <FormItem v-if="formValidate.type==='MINIO'" label="访问地址" prop="m_frontUrl">
+      <FormItem v-if="formValidate.type==='MINIO'" label="访问地址" key="m_frontUrl" prop="m_frontUrl">
         <Input v-model="formValidate.m_frontUrl"/>
         <span class="desc">配置MINIO nginx前端访问转发地址，一般为完整域名，例如：https://minio.pickmall.cn</span>
       </FormItem>
-      <FormItem v-if="formValidate.type==='MINIO'" label="endpoint" prop="m_endpoint">
+      <FormItem v-if="formValidate.type==='MINIO'" label="endpoint" key="m_endpoint" prop="m_endpoint">
         <Input v-model="formValidate.m_endpoint"/>
       </FormItem>
-
-      <FormItem v-if="formValidate.type==='MINIO'" label="accessKey" class="label-item" prop="m_accessKey">
+      <FormItem v-if="formValidate.type==='MINIO'" label="accessKey" key="m_accessKey" class="label-item" prop="m_accessKey">
         <Input v-model="formValidate.m_accessKey"/>
       </FormItem>
-      <FormItem v-if="formValidate.type==='MINIO'" label="secretKey" prop="bucketName">
+      <FormItem v-if="formValidate.type==='MINIO'" label="secretKey" key="m_secretKey" prop="m_secretKey">
         <Input v-model="formValidate.m_secretKey"/>
       </FormItem>
-      <FormItem v-if="formValidate.type==='MINIO'" label="bucketName" prop="accessKeyId">
+      <FormItem v-if="formValidate.type==='MINIO'" label="bucketName" key="m_bucketName" prop="m_bucketName">
         <Input v-model="formValidate.m_bucketName"/>
       </FormItem>
+
+
+      <!--      华为云存储-->
+      <FormItem v-if="formValidate.type==='HUAWEI_OBS'" label="发起者的Access Key" key="huaweicloudOBSAccessKey" prop="huaweicloudOBSAccessKey">
+        <Input v-model="formValidate.huaweicloudOBSAccessKey"/>
+      </FormItem>
+      <FormItem v-if="formValidate.type==='HUAWEI_OBS'" label="密钥" class="label-item" key="huaweicloudOBSSecretKey" prop="huaweicloudOBSSecretKey">
+        <Input v-model="formValidate.huaweicloudOBSSecretKey"/>
+      </FormItem>
+      <FormItem v-if="formValidate.type==='HUAWEI_OBS'" label="节点" key="huaweicloudOBSEndPoint" prop="huaweicloudOBSEndPoint">
+        <Input v-model="formValidate.huaweicloudOBSEndPoint"/>
+      </FormItem>
+      <FormItem v-if="formValidate.type==='HUAWEI_OBS'" label="桶" key="huaweicloudOBSBucketName" prop="huaweicloudOBSBucketName">
+        <Input v-model="formValidate.huaweicloudOBSBucketName"/>
+      </FormItem>
+
+      <!--      腾讯云存储-->
+      <FormItem v-if="formValidate.type==='TENCENT_COS'" label="用户的SecretId" key="tencentCOSSecretId" prop="tencentCOSSecretId">
+        <Input v-model="formValidate.tencentCOSSecretId"/>
+      </FormItem>
+      <FormItem v-if="formValidate.type==='TENCENT_COS'" label="用户的SecretKey" key="tencentCOSSecretKey" class="label-item" prop="tencentCOSSecretKey">
+        <Input v-model="formValidate.tencentCOSSecretKey"/>
+      </FormItem>
+      <FormItem v-if="formValidate.type==='TENCENT_COS'" label="bucket的地域" key="tencentCOSRegion" prop="tencentCOSRegion">
+        <Input v-model="formValidate.tencentCOSRegion"/>
+      </FormItem>
+      <FormItem v-if="formValidate.type==='TENCENT_COS'" label="bucket" key="tencentCOSBucket" prop="tencentCOSBucket">
+        <Input v-model="formValidate.tencentCOSBucket"/>
+      </FormItem>
+
 
       <div class="label-btns">
         <Button type="primary" @click="submit('formValidate')">保存</Button>
@@ -63,17 +91,26 @@ export default {
       ruleValidate: {}, // 验证规则
       formValidate: { // 表单数据
         type: "",
-        accessKeyId: "",
-        accessKeySecret: "",
-        bucketName: "",
-        picLocation: "",
-        endPoint: "",
+        aliyunOSSAccessKeyId: "",
+        aliyunOSSAccessKeySecret: "",
+        aliyunOSSBucketName: "",
+        aliyunOSSEndPoint: "",
         m_endpoint: "",
         m_accessKey: "",
         m_secretKey: "",
         m_bucketName: "",
-        m_frontUrl: ""
+        m_frontUrl: "",
+        huaweicloudOBSAccessKey: "",
+        huaweicloudOBSSecretKey: "",
+        huaweicloudOBSEndPoint: "",
+        huaweicloudOBSBucketName: "",
+        tencentCOSSecretId: "",
+        tencentCOSSecretKey: "",
+        tencentCOSRegion: "",
+        tencentCOSBucket: "",
+        tencentCOSEndPoint: "",
       },
+      result:""
     };
   },
   props: ["res", "type"],
@@ -100,9 +137,9 @@ export default {
     },
     // 实例化数据
     init() {
-      this.res = JSON.parse(this.res);
+      this.result = JSON.parse(this.res);
 
-      this.$set(this, "formValidate", {...this.res});
+      this.$set(this, "formValidate", {...this.result});
       Object.keys(this.formValidate).forEach((item) => {
         this.ruleValidate[item] = [
           {
@@ -139,3 +176,4 @@ export default {
   color: #999;
 }
 </style>
+

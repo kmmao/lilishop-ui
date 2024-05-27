@@ -1,95 +1,104 @@
 <template>
   <div class="merchant">
-      <BaseHeader/>
-      <!-- 搜索栏 -->
-      <Search :store="true" @search="search"></Search>
-      <!-- 店铺logo -->
-      <div class="shop-logo">
-        <div>
-          <p>{{storeMsg.storeName || 'xx店铺'}}</p>
-          <p class="ellipsis" :alt="storeMsg.storeDesc" v-html="storeMsg.storeDesc"></p>
-        </div>
-        <div>
-          <span class="hover-pointer" @click="collect"><Icon type="ios-heart" :color="storeCollected ? '#ed3f14' : '#fff'" />{{storeCollected?'已收藏店铺':'收藏店铺'}}</span>
-          <span style="width:80px" class="hover-pointer ml_10" @click="IMService()"><Icon custom="icomoon icon-customer-service"  />联系客服</span>
-        </div>
+    <BaseHeader/>
+    <!-- 搜索栏 -->
+    <Search  :storeId="storeMsg.storeId" @search="search"></Search>
+    <!-- 店铺logo -->
+    <div class="shop-logo">
+      <div>
+        <p>{{ storeMsg.storeName || '店铺' }}</p>
+        <p :alt="storeMsg.storeDesc" class="ellipsis" v-html="storeMsg.storeDesc"></p>
       </div>
-      <div class="store-category">
-        <ul class="cate-list">
-          <li
-            class="cate-item"
-            @click="searchByCate({ id: '', labelName: '店铺推荐' })"
-          >
-            首页
-          </li>
-          <li class="cate-item" v-for="(cate, index) in cateList" :key="index">
-            <Dropdown v-if="cate.children.length">
-              <div @click.self="searchByCate(cate)">
-                {{ cate.labelName }}
-                <Icon type="ios-arrow-down"></Icon>
-              </div>
-              <DropdownMenu slot="list">
-                <DropdownItem
-                  @click.native="searchByCate(sec)"
-                  :name="sec.id"
-                  v-for="sec in cate.children"
-                  :key="sec.id"
-                >{{ sec.labelName }}
-                </DropdownItem
-                >
-              </DropdownMenu>
-            </Dropdown>
-            <span v-else @click.self="searchByCate(cate)">{{
-                cate.labelName
-              }}</span>
-          </li>
-        </ul>
+      <div>
+        <span class="hover-pointer" @click="collect"><Icon :color="storeCollected ? '#ed3f14' : '#fff'"
+                                                           type="ios-heart"/>{{
+            storeCollected ? '已收藏店铺' : '收藏店铺'
+          }}</span>
+        <span class="hover-pointer ml_10" style="width:80px" @click="IMService(storeMsg.storeId,null,null)"><Icon
+          custom="icomoon icon-customer-service"/>联系客服</span>
       </div>
+    </div>
+    <div class="store-category">
+      <ul class="cate-list">
+        <li
+          class="cate-item"
+          @click="searchByCate({ id: '', labelName: '店铺推荐' })"
+        >
+          首页
+        </li>
+        <li v-for="(cate, index) in cateList" :key="index" class="cate-item">
+          <Dropdown v-if="cate.children.length">
+            <div @click.self="searchByCate(cate)">
+              {{ cate.labelName }}
+              <Icon type="ios-arrow-down"></Icon>
+            </div>
+            <DropdownMenu slot="list">
+              <DropdownItem
+                v-for="sec in cate.children"
+                :key="sec.id"
+                :name="sec.id"
+                @click.native="searchByCate(sec)"
+              >{{ sec.labelName }}
+              </DropdownItem
+              >
+            </DropdownMenu>
+          </Dropdown>
+          <span v-else @click.self="searchByCate(cate)">{{
+              cate.labelName
+            }}</span>
+        </li>
+      </ul>
+    </div>
 
+
+    <div v-if="storeMsg.pageShow&&storeMsg.pageShow==='1'">
+      <!-- 楼层装修部分 -->
+      <model-form ref="modelForm" :data="modelForm"></model-form>
+    </div>
+
+
+    <div v-else>
       <div class="promotion-decorate">{{ cateName }}</div>
+      <div class="goods-list">
+        <empty v-if="goodsList.length === 0"/>
+        <div
+          v-for="(item, index) in goodsList"
+          v-else
+          :key="index"
+          class="goods-show-info"
+          @click="goGoodsDetail(item.id, item.goodsId)"
+        >
 
-<!--      <div class="goods-list">-->
-<!--        <empty v-if="goodsList.length === 0"/>-->
-<!--        <div-->
-<!--          v-else-->
-<!--          class="goods-show-info"-->
-<!--          v-for="(item, index) in goodsList"-->
-<!--          :key="index"-->
-<!--          @click="goGoodsDetail(item.content.id, item.content.goodsId)"-->
-<!--        >-->
-<!--          <div class="goods-show-img">-->
-<!--            <img width="220" height="220" :src="item.content.thumbnail"/>-->
-<!--          </div>-->
-<!--          <div class="goods-show-price">-->
-<!--            <span>-->
-<!--              <span class="seckill-price text-danger">{{-->
-<!--                  item.content.price | unitPrice("￥")-->
-<!--                }}</span>-->
-<!--            </span>-->
-<!--          </div>-->
-<!--          <div class="goods-show-detail">-->
-<!--            <span>{{ item.content.goodsName }}</span>-->
-<!--          </div>-->
-<!--          <div class="goods-show-num">-->
-<!--            已有<span>{{ item.content.commentNum || 0 }}</span-->
-<!--          >人评价-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--      <div class="goods-page">-->
-<!--        <Page-->
-<!--          show-sizer-->
-<!--          @on-change="changePageNum"-->
-<!--          @on-page-size-change="changePageSize"-->
-<!--          :total="total"-->
-<!--          :page-size="params.pageSize"-->
-<!--        ></Page>-->
-<!--      </div>-->
-<!--      -->
+          <div class="goods-show-img">
+            <img :src="item.small" height="220" width="220" alt=""/>
+          </div>
+          <div class="goods-show-price">
+            <span>
+              <span class="seckill-price text-danger">{{
+                  item.price | unitPrice("￥")
+                }}</span>
+            </span>
+          </div>
+          <div class="goods-show-detail">
+            <span>{{ item.goodsName }}</span>
+          </div>
+          <div class="goods-show-num">
+            已有<span>{{ item.commentNum || 0 }}</span
+          >人评价
+          </div>
+        </div>
+      </div>
+      <div class="goods-page">
+        <Page
+          :page-size="params.pageSize"
+          :total="total"
+          show-sizer
+          @on-change="changePageNum"
+          @on-page-size-change="changePageSize"
+        ></Page>
+      </div>
 
-
-    <!-- 楼层装修部分 -->
-    <model-form ref="modelForm" :data="modelForm"></model-form>
+    </div>
 
     <BaseFooter/>
 
@@ -97,17 +106,16 @@
 </template>
 
 <script>
-import { getIMDetail } from "@/api/common";
-import Storage from "../plugins/storage";
-import {getDetailById, getCateById} from "@/api/shopentry";
-import {cancelCollect, collectGoods, isCollection} from "@/api/member";
+
+import {getCateById, getDetailById} from "@/api/shopentry";
+import {cancelStoreCollect, collectStore} from "@/api/member";
 import {goodsList} from "@/api/goods";
 import Search from "@/components/Search";
 import ModelForm from "@/components/indexDecorate/ModelForm";
 import HoverSearch from "@/components/header/hoverSearch";
 import storage from "@/plugins/storage";
 import {getFloorStoreData} from "@/api/index.js";
-import {seckillByDay} from "@/api/promotion";
+import imTalk from '@/components/mixes/talkIm'
 
 export default {
   name: "Merchant",
@@ -116,6 +124,7 @@ export default {
     ModelForm,
     HoverSearch,
   },
+  mixins: [imTalk],
   data() {
     return {
       // 店铺装修的内容
@@ -131,7 +140,6 @@ export default {
       cateList: [], // 店铺分裂
       goodsList: [], // 商品列表
       total: 0, // 商品数量
-      IMLink:"",
       params: {
         // 请求参数
         pageNumber: 1,
@@ -156,8 +164,8 @@ export default {
             let dataJson = JSON.parse(res.result.pageData);
             // 秒杀活动不是装修的数据，需要调用接口判断是否有秒杀商品
             // 轮播图根据不同轮播，样式不同
-            for (let i = 0; i < dataJson.list.length; i++) {
-              let type = dataJson.list[i].type;
+            for (const element of dataJson.list) {
+              let type = element.type;
               if (type === "carousel2") {
                 this.carouselLarge = true;
               } else if (type === "carousel1") {
@@ -178,30 +186,8 @@ export default {
         }
       );
     },
-    // 跳转im客服
-    async IMService() {
-      // 获取访问Token
-      let accessToken = Storage.getItem("accessToken");
-      await this.getIMDetailMethods();
-      if (!accessToken) {
-        this.$Message.error("请登录后再联系客服");
-        return;
-      }
-      window.open(
-        this.IMLink +
-        "?token=" +
-        accessToken +
-        "&id=" +
-        this.storeMsg.storeId
-      );
-    },
-    // 获取im信息
-    async getIMDetailMethods() {
-      let res = await getIMDetail();
-      if (res.success) {
-        this.IMLink = res.result;
-      }
-    },
+
+
     // getStoreMsg () { // 店铺信息
     //   getDetailById(this.$route.query.id).then(res => {
     //     if (res.success) {
@@ -233,9 +219,16 @@ export default {
         if (res.success) {
 
           this.storeMsg = res.result;
+          console.log(this.storeMsg)
 
+          //判定如果开启楼层展示，则获取页面信息 否则读取商品信息
+          if (this.storeMsg.pageShow && this.storeMsg.pageShow === '1') {
 
-          this.getIndexData();
+            this.getIndexData();
+          } else {
+            this.getGoodsList();
+            this.getCateList();
+          }
           let that = this;
           window.onscroll = function () {
             let top =
@@ -254,6 +247,7 @@ export default {
       getCateById(this.$route.query.id).then((res) => {
         if (res.success) {
           this.cateList = res.result;
+          console.log(this.cateList,'cateList')
         }
       });
     },
@@ -262,8 +256,8 @@ export default {
       goodsList(this.params)
         .then((res) => {
           if (res.success) {
-            this.goodsList = res.result.content;
-            this.total = res.result.totalElements;
+            this.goodsList = res.result.records;
+            this.total = res.result.total;
           }
         })
         .catch(() => {
@@ -303,13 +297,13 @@ export default {
     async collect() {
       // 收藏店铺
       if (this.storeCollected) {
-        let cancel = await cancelCollect("STORE", this.storeMsg.storeId);
+        let cancel = await cancelStoreCollect("STORE", this.storeMsg.storeId);
         if (cancel.success) {
           this.$Message.success("已取消收藏");
           this.storeCollected = false;
         }
       } else {
-        let collect = await collectGoods("STORE", this.storeMsg.storeId);
+        let collect = await collectStore("STORE", this.storeMsg.storeId);
         if (collect.code === 200) {
           this.storeCollected = true;
           this.$Message.success("收藏店铺成功,可以前往个人中心我的收藏查看");
@@ -320,7 +314,7 @@ export default {
 };
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 @import "../assets/styles/goodsList.scss";
 
 .merchant {
