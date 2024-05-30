@@ -11,10 +11,10 @@ var BASE = {
    * @description api请求基础路径
    */
   API_DEV: {
-    common: "https://common-api.zmshops.xycloud.info",
-    buyer: "https://buyer-api.zmshops.xycloud.info",
-    seller: "https://store-api.zmshops.xycloud.info",
-    manager: "https://admin-api.zmshops.xycloud.info"
+    common: "https://common-api.zmshops.zmddg.com",
+    buyer: "https://buyer-api.zmshops.zmddg.com",
+    seller: "https://store-api.zmshops.zmddg.com",
+    manager: "https://admin-api.zmshops.zmddg.com"
   },
   API_PROD: {
     // common: "https://common-api.zmshops.xycloud.info",

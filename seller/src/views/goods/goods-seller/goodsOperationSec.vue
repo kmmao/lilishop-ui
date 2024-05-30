@@ -538,7 +538,7 @@
               <editor
                 ref="editor"
                 v-model="baseInfoForm.intro"
-                :init="{ ...initEditor, height: '800px' }"
+                height="800px"
                 openXss
               ></editor>
               <div class="promise-intro-btn">
@@ -557,7 +557,7 @@
               <editor
                 ref="editor"
                 v-model="baseInfoForm.mobileIntro"
-                :init="{ ...initEditor, height: '800px' }"
+                height="800px"
                 openXss
               ></editor>
             </FormItem>
@@ -697,15 +697,14 @@ import * as API_GOODS from "@/api/goods";
 import * as API_Shop from "@/api/shops";
 import cloneObj from "@/utils/index";
 import vuedraggable from "vuedraggable";
-import Editor from "@tinymce/tinymce-vue";
-import { initEditor } from "@/views/lili-components/editor/config";
+import tinymec from "@/views/lili-components/editor/index.vue";
 import { uploadFile } from "@/libs/axios";
 import { regular } from "@/utils";
 
 export default {
   name: "goodsOperationSec",
   components: {
-    editor: Editor,
+    editor: tinymec,
     vuedraggable,
   },
   props: {
@@ -732,7 +731,6 @@ export default {
     };
     return {
       regular,
-      initEditor,
       total: 0,
       global: 0,
       accessToken: "", //令牌token
