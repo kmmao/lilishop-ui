@@ -25,9 +25,9 @@ var BASE = {
       // buyer: "https://buyer-api.zmshops.xycloud.info",
       // seller: "https://store-api.zmshops.xycloud.info",
       // manager: "https://admin-api.zmshops.xycloud.info"
-      common: "https://common-api.zmshops.zmddg.com",
-      buyer: "https://buyer-api.zmshops.zmddg.com",
-      seller: "https://store-api.zmshops.zmddg.com",
-      manager: "https://admin-api.zmshops.zmddg.com"
-    }
+      common: "https://manager.zmshops.zmddg.com/common-api",
+      buyer: "https://manager.zmshops.zmddg.com/buyer-api",
+      seller: "https://manager.zmshops.zmddg.com/store-api",
+      manager: "https://manager.zmshops.zmddg.com/admin-api"
+    },
   };
